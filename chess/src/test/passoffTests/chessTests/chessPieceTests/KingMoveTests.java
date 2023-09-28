@@ -28,6 +28,9 @@ public class KingMoveTests {
     @DisplayName("Move Unhindered")
     public void kingEmptyBoard() {
 
+
+        
+
         /*
         | | | | | | | | |
 		| | | | | | | | |
