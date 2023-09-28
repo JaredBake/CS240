@@ -27,9 +27,7 @@ public class KingMoveTests {
     @Test
     @DisplayName("Move Unhindered")
     public void kingEmptyBoard() {
-
-
-        
+        // hey
 
         /*
         | | | | | | | | |
