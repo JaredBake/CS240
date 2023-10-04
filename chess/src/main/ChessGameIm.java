@@ -1,8 +1,8 @@
-package chess;
+import chess.*;
 
 import java.util.Collection;
 
-public class ChessGameIm implements ChessGame{
+public class ChessGameIm implements ChessGame {
     @Override
     public TeamColor getTeamTurn() {
         return null;

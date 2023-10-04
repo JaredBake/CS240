@@ -1,6 +1,8 @@
-package chess;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
-public class ChessMoveIm implements ChessMove{
+public class ChessMoveIm implements ChessMove {
     @Override
     public ChessPosition getStartPosition() {
         return null;

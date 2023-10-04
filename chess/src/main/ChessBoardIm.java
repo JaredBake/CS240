@@ -1,8 +1,10 @@
-package chess;
+import chess.ChessBoard;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
 
-public class ChessBoardIm implements ChessBoard{
+public class ChessBoardIm implements ChessBoard {
 
 //    ArrayList<ArrayList<ChessPositionIm>> board = new ArrayList<ArrayList<ChessPositionIm>>();
     ChessPiece[][] board;

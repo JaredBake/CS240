@@ -1,6 +1,6 @@
-package chess;
+import chess.ChessPosition;
 
-public class ChessPositionIm implements ChessPosition{
+public class ChessPositionIm implements ChessPosition {
     private int row = 0;
     private char column = 0;
     public void setRow(int r){
