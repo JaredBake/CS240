@@ -1,7 +1,8 @@
 package main;
 
-import chess.*;
-import main.*;
+import chess.ChessBoard;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 public class ChessBoardIm implements ChessBoard {
 
@@ -13,6 +14,10 @@ public class ChessBoardIm implements ChessBoard {
     }
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
+        board[position.getRow()-1][position.getColumn()-1] = piece;
+    }
+
+    public void firstadds(ChessPosition position, ChessPiece piece) {
         board[position.getRow()][position.getColumn()] = piece;
     }
 
@@ -31,14 +36,14 @@ public class ChessBoardIm implements ChessBoard {
         //TODO make all the empty positions not null
         ChessPositionIm position = new ChessPositionIm(1,1);
         board = new ChessPieceIm[8][8];
-        ChessPieceIm p = new ChessPieceIm();
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
                 if (i < 2 || i > 5){
+                    ChessPieceIm p = new ChessPieceIm();
                     position.setRow(i);
                     position.setColumn(j);
                     p.setPieceType(position);
-                    addPiece(position, p);
+                    firstadds(position, p);
                 }
 
             }

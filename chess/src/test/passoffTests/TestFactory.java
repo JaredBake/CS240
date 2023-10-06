@@ -18,22 +18,22 @@ public class TestFactory {
 
     public static ChessGame getNewGame(){
         // FIXME
-		return null;
+		return new ChessGameIm();
     }
 
     public static ChessPiece getNewPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){
         // FIXME
-		return null;
+		return new ChessPieceIm(pieceColor, type);
     }
 
     public static ChessPosition getNewPosition(Integer row, Integer col){
         // FIXME
-		return null;
+		return new ChessPositionIm(row, col);
     }
 
     public static ChessMove getNewMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece){
         // FIXME
-		return null;
+		return new ChessMoveIm();
     }
     //------------------------------------------------------------------------------------------------------------------
 
