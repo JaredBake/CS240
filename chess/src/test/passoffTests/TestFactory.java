@@ -1,6 +1,7 @@
 package passoffTests;
 
 import chess.*;
+import main.ChessBoardIm;
 
 /**
  * Used for testing your code
@@ -12,7 +13,7 @@ public class TestFactory {
     //------------------------------------------------------------------------------------------------------------------
     public static ChessBoard getNewBoard(){
         // FIXME
-		return null;
+		return new ChessBoardIm();
     }
 
     public static ChessGame getNewGame(){

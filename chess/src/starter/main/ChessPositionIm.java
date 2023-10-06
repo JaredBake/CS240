@@ -1,3 +1,5 @@
+package main;
+
 import chess.ChessPosition;
 
 public class ChessPositionIm implements ChessPosition {

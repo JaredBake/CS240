@@ -1,3 +1,5 @@
+package main;
+
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
