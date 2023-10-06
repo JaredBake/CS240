@@ -70,6 +70,7 @@ public interface ChessGame {
      */
     void setBoard(ChessBoard board);
 
+
     /**
      * Gets the current chessboard
      * @return the chessboard

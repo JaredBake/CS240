@@ -1,19 +1,22 @@
 package main;
 
 import chess.*;
-import main.*;
 
 import java.util.Collection;
 
 public class ChessGameIm implements ChessGame {
+    TeamColor turn;
+    ChessBoard board;
+
     @Override
     public TeamColor getTeamTurn() {
-        return null;
+
+        return turn;
     }
 
     @Override
     public void setTeamTurn(TeamColor team) {
-
+        turn = team;
     }
 
     @Override
@@ -43,11 +46,11 @@ public class ChessGameIm implements ChessGame {
 
     @Override
     public void setBoard(ChessBoard board) {
-
+        this.board = board;
     }
 
     @Override
     public ChessBoard getBoard() {
-        return null;
+        return board;
     }
 }
