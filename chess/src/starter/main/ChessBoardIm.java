@@ -1,8 +1,7 @@
 package main;
 
-import chess.ChessBoard;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import main.*;
 
 public class ChessBoardIm implements ChessBoard {
 

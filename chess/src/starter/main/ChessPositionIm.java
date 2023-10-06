@@ -1,6 +1,8 @@
 package main;
 
-import chess.ChessPosition;
+import chess.*;
+import main.*;
+
 
 public class ChessPositionIm implements ChessPosition {
     private int row = 0;

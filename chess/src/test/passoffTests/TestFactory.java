@@ -1,7 +1,7 @@
 package passoffTests;
 
 import chess.*;
-import main.ChessBoardIm;
+import main.*;
 
 /**
  * Used for testing your code

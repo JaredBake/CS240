@@ -1,8 +1,7 @@
 package main;
 
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import main.*;
 
 public class ChessMoveIm implements ChessMove {
     @Override
