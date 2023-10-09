@@ -4,10 +4,11 @@ import chess.*;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class ChessPieceIm implements ChessPiece {
-
+    private boolean blocked_piece = false;
     private ChessBoard the_board = new ChessBoardIm();
     private ChessGame.TeamColor teamColor;
     private PieceType type;
@@ -34,6 +35,7 @@ public class ChessPieceIm implements ChessPiece {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        ChessPosition pos = new ChessPositionIm(7,4);
         the_board = board;
         Set<ChessMove> valid_moves =  new HashSet<>();
         ChessPosition temp_position = myPosition;
@@ -47,6 +49,9 @@ public class ChessPieceIm implements ChessPiece {
                 bishopTL(temp_position,pc,valid_moves);
                 bishopBR(temp_position,pc,valid_moves);
                 bishopBL(temp_position,pc,valid_moves);
+                if(valid_moves.contains(new ChessMoveIm(myPosition,pos,null))){
+                    System.out.println("Has the captured piece in it");
+                }
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KNIGHT){
@@ -71,6 +76,7 @@ public class ChessPieceIm implements ChessPiece {
     }
 
     private boolean validMove(ChessPosition temp_position, ChessGame.TeamColor pc) {
+
         if (temp_position.getColumn() > 8 || temp_position.getRow() > 8){
             return false;
         }
@@ -81,47 +87,62 @@ public class ChessPieceIm implements ChessPiece {
             return true;
         }
         if (the_board.getPiece(temp_position).getTeamColor() == pc){
+            blocked_piece = true;
             return false;
         }
+        blocked_piece = true;
         return true;
     }
 
     private void bishopTR(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
-
+        blocked_piece = false;
         ChessPosition end_position = new ChessPositionIm(temp_position.getRow()+1, temp_position.getColumn()+1);
         ChessMove move = new ChessMoveIm(temp_position, end_position, null);
         while(validMove(end_position,pc)){
             valid_moves.add(move);
+            if (blocked_piece){
+                break;
+            }
             end_position = new ChessPositionIm(end_position.getRow()+1, end_position.getColumn()+1);
             move = new ChessMoveIm(temp_position, end_position, null);
         }
     }
     private void bishopBR(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
-
-        ChessPosition end_position = new ChessPositionIm(temp_position.getRow()+1, temp_position.getColumn()+1);
+        blocked_piece = false;
+        ChessPosition end_position = new ChessPositionIm(temp_position.getRow()-1, temp_position.getColumn()+1);
         ChessMove move = new ChessMoveIm(temp_position, end_position, null);
         while(validMove(end_position,pc)){
             valid_moves.add(move);
+            if (blocked_piece){
+                break;
+            }
             end_position = new ChessPositionIm(end_position.getRow()-1, end_position.getColumn()+1);
             move = new ChessMoveIm(temp_position, end_position, null);
         }
     }
     private void bishopTL(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
-
+        blocked_piece = false;
         ChessPosition end_position = new ChessPositionIm(temp_position.getRow()+1, temp_position.getColumn()-1);
         ChessMove move = new ChessMoveIm(temp_position, end_position, null);
         while(validMove(end_position,pc)){
             valid_moves.add(move);
+            if (blocked_piece){
+                break;
+            }
             end_position = new ChessPositionIm(end_position.getRow()+1, end_position.getColumn()-1);
             move = new ChessMoveIm(temp_position, end_position, null);
         }
     }
     private void bishopBL(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+        blocked_piece = false;
         if (temp_position.getRow()-1 >= 1 && temp_position.getColumn()-1 >= 1) {
             ChessPosition end_position = new ChessPositionIm(temp_position.getRow() - 1, temp_position.getColumn() - 1);
             ChessMove move = new ChessMoveIm(temp_position, end_position, null);
             while (validMove(end_position, pc)) {
                 valid_moves.add(move);
+                if (blocked_piece){
+                    break;
+                }
                 if (end_position.getRow()-1 >= 1 && end_position.getColumn()-1 >= 1) {
                     end_position = new ChessPositionIm(end_position.getRow() - 1, end_position.getColumn() - 1);
                     move = new ChessMoveIm(temp_position, end_position, null);
@@ -180,5 +201,18 @@ public class ChessPieceIm implements ChessPiece {
 
     public void setPosition(ChessPosition p){
         position = p;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPieceIm that = (ChessPieceIm) o;
+        return blocked_piece == that.blocked_piece && Objects.equals(the_board, that.the_board) && teamColor == that.teamColor && type == that.type && Objects.equals(position, that.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(blocked_piece, the_board, teamColor, type, position);
     }
 }

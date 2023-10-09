@@ -4,6 +4,8 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Objects;
+
 public class ChessMoveIm implements ChessMove {
     private ChessPosition start_pos;
     private ChessPosition end_pos;
@@ -28,5 +30,18 @@ public class ChessMoveIm implements ChessMove {
     @Override
     public ChessPiece.PieceType getPromotionPiece() {
         return promo_piece;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessMoveIm that = (ChessMoveIm) o;
+        return Objects.equals(start_pos, that.start_pos) && Objects.equals(end_pos, that.end_pos) && promo_piece == that.promo_piece;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(start_pos, end_pos, promo_piece);
     }
 }

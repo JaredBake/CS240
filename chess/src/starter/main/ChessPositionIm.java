@@ -2,6 +2,8 @@ package main;
 
 import chess.ChessPosition;
 
+import java.util.Objects;
+
 
 public class ChessPositionIm implements ChessPosition {
     private int row = 0;
@@ -33,5 +35,18 @@ public class ChessPositionIm implements ChessPosition {
     @Override
     public int getColumn() {
         return column;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPositionIm that = (ChessPositionIm) o;
+        return row == that.row && column == that.column;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, column);
     }
 }
