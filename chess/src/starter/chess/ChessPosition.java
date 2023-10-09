@@ -10,10 +10,13 @@ public interface ChessPosition {
      */
     int getRow();
 
+
     /**
      * @return which column this position is in
      * 1 codes for the left row
      */
+
+
     int getColumn();
 
     //TODO (1,1) coding for bottom left matches a1, matching chess notation better.
