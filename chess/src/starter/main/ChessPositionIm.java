@@ -15,6 +15,12 @@ public class ChessPositionIm implements ChessPosition {
     public void setRow(int r){
         row = r;
     }
+
+    @Override
+    public void setColoumn(int c) {
+
+    }
+
     @Override
     public int getRow() {
         return row;
