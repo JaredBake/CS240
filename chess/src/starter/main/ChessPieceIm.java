@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class ChessPieceIm implements ChessPiece {
+    private boolean promotion = false;
     private boolean blocked_piece = false;
     private ChessBoard the_board = new ChessBoardIm();
     private ChessGame.TeamColor teamColor;
@@ -55,6 +56,7 @@ public class ChessPieceIm implements ChessPiece {
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KNIGHT){
+                knightMove(temp_position,pc,valid_moves);
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.QUEEN){
@@ -69,6 +71,12 @@ public class ChessPieceIm implements ChessPiece {
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.PAWN){
+                if (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.BLACK){
+                    blackPawnMove(temp_position,pc,valid_moves);
+                }else{
+                    whitePawnMove(temp_position,pc,valid_moves);
+                }
+
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KING){
@@ -159,6 +167,7 @@ public class ChessPieceIm implements ChessPiece {
             }
         }
     }
+
     private void kingMove(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
         blocked_piece = false;
         ChessPosition end_position = new ChessPositionIm(temp_position.getRow()+1,temp_position.getColumn());
@@ -202,6 +211,7 @@ public class ChessPieceIm implements ChessPiece {
             valid_moves.add(move);
         }
     }
+
     private void knightMove(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
         blocked_piece = false;
         ChessPosition end_position = new ChessPositionIm(temp_position.getRow()+2,temp_position.getColumn()+1);
@@ -245,6 +255,7 @@ public class ChessPieceIm implements ChessPiece {
             valid_moves.add(move);
         }
     }
+
     private void queenU(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
         blocked_piece = false;
         if (temp_position.getRow()+1 <= 8) {
@@ -369,6 +380,194 @@ public class ChessPieceIm implements ChessPiece {
             }
         }
     }
+
+    private void blackPawnMove(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+        ChessPosition end_position = new ChessPositionIm(temp_position.getRow()-1,temp_position.getColumn());
+        ChessMove move = new ChessMoveIm(temp_position, end_position, null);
+
+        if (temp_position.getRow() == 7) {
+            if (pawnMove(end_position, pc)) {
+                valid_moves.add(move);
+                end_position = new ChessPositionIm(temp_position.getRow() - 2, temp_position.getColumn());
+                valid_moves.add(move);
+                if (pawnMove(end_position, pc)) {
+                    move = new ChessMoveIm(temp_position, end_position, null);
+                    valid_moves.add(move);
+                }
+            }
+        }
+
+        end_position = new ChessPositionIm(temp_position.getRow()-1,temp_position.getColumn());
+        move = new ChessMoveIm(temp_position, end_position, null);
+        if (pawnMove(end_position,pc)){
+            if (promotion){
+                move = new ChessMoveIm(temp_position,end_position,PieceType.QUEEN);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.KNIGHT);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.ROOK);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.BISHOP);
+            }
+            valid_moves.add(move);
+        }
+        end_position = new ChessPositionIm(temp_position.getRow()-1,temp_position.getColumn()-1);
+        move = new ChessMoveIm(temp_position, end_position, null);
+        if (pawnAttack(end_position,pc)){
+            if (promotion){
+                move = new ChessMoveIm(temp_position,end_position,PieceType.QUEEN);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.KNIGHT);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.ROOK);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.BISHOP);
+            }
+            valid_moves.add(move);
+        }
+        end_position = new ChessPositionIm(temp_position.getRow()-1,temp_position.getColumn()+1);
+        move = new ChessMoveIm(temp_position, end_position, null);
+        if (pawnAttack(end_position,pc)){
+            if (promotion){
+                move = new ChessMoveIm(temp_position,end_position,PieceType.QUEEN);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.KNIGHT);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.ROOK);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.BISHOP);
+            }
+            valid_moves.add(move);
+        }
+    }
+    private void whitePawnMove(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+
+        ChessPosition end_position = new ChessPositionIm(temp_position.getRow()+1,temp_position.getColumn());
+        ChessMove move = new ChessMoveIm(temp_position, end_position, null);
+
+        if (temp_position.getRow() == 2) {
+            if (pawnMove(end_position, pc)) {
+                end_position = new ChessPositionIm(temp_position.getRow() + 2, temp_position.getColumn());
+                valid_moves.add(move);
+                if (pawnMove(end_position, pc)) {
+                    move = new ChessMoveIm(temp_position, end_position, null);
+                    valid_moves.add(move);
+                }
+            }
+        }
+
+        end_position = new ChessPositionIm(temp_position.getRow()+1,temp_position.getColumn());
+        move = new ChessMoveIm(temp_position, end_position, null);
+        if (pawnMove(end_position,pc)){
+            if (promotion){
+                move = new ChessMoveIm(temp_position,end_position,PieceType.QUEEN);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.KNIGHT);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.ROOK);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.BISHOP);
+            }
+            valid_moves.add(move);
+        }
+        end_position = new ChessPositionIm(temp_position.getRow()+1,temp_position.getColumn()+1);
+        move = new ChessMoveIm(temp_position, end_position, null);
+        if (pawnAttack(end_position,pc)){
+            if (promotion){
+                move = new ChessMoveIm(temp_position,end_position,PieceType.QUEEN);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.KNIGHT);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.ROOK);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.BISHOP);
+            }
+            valid_moves.add(move);
+        }
+        end_position = new ChessPositionIm(temp_position.getRow()+1,temp_position.getColumn()-1);
+        move = new ChessMoveIm(temp_position, end_position, null);
+        if (pawnAttack(end_position,pc)){
+            if (promotion){
+                move = new ChessMoveIm(temp_position,end_position,PieceType.QUEEN);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.KNIGHT);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.ROOK);
+                valid_moves.add(move);
+                move = new ChessMoveIm(temp_position,end_position,PieceType.BISHOP);
+            }
+            valid_moves.add(move);
+        }
+    }
+
+    private void rookU(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+        blocked_piece = false;
+        if (temp_position.getRow()+1 <= 8) {
+            ChessPosition end_position = new ChessPositionIm(temp_position.getRow() + 1, temp_position.getColumn());
+            ChessMove move = new ChessMoveIm(temp_position, end_position, null);
+            while (validMove(end_position, pc)) {
+                valid_moves.add(move);
+                if (blocked_piece) {
+                    break;
+                }
+                if (temp_position.getRow()+1 <= 8) {
+                    end_position = new ChessPositionIm(end_position.getRow() + 1, end_position.getColumn());
+                    move = new ChessMoveIm(temp_position, end_position, null);
+                }
+            }
+        }
+    }
+    private void rookD(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+        blocked_piece = false;
+        if (temp_position.getRow()-1 >= 1) {
+            ChessPosition end_position = new ChessPositionIm(temp_position.getRow() - 1, temp_position.getColumn());
+            ChessMove move = new ChessMoveIm(temp_position, end_position, null);
+            while (validMove(end_position, pc)) {
+                valid_moves.add(move);
+                if (blocked_piece) {
+                    break;
+                }
+                if (temp_position.getRow()-1 >= 1) {
+                    end_position = new ChessPositionIm(end_position.getRow() - 1, end_position.getColumn());
+                    move = new ChessMoveIm(temp_position, end_position, null);
+                }
+            }
+        }
+    }
+    private void rookL(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+        blocked_piece = false;
+        if (temp_position.getColumn()-1 >= 1) {
+            ChessPosition end_position = new ChessPositionIm(temp_position.getRow(), temp_position.getColumn()-1);
+            ChessMove move = new ChessMoveIm(temp_position, end_position, null);
+            while (validMove(end_position, pc)) {
+                valid_moves.add(move);
+                if (blocked_piece) {
+                    break;
+                }
+                if (temp_position.getColumn()-1 >= 1) {
+                    end_position = new ChessPositionIm(end_position.getRow(), end_position.getColumn()-1);
+                    move = new ChessMoveIm(temp_position, end_position, null);
+                }
+            }
+        }
+    }
+    private void rookR(ChessPosition temp_position, ChessGame.TeamColor pc, Collection<ChessMove> valid_moves){
+        blocked_piece = false;
+        if (temp_position.getColumn()+1 <= 8) {
+            ChessPosition end_position = new ChessPositionIm(temp_position.getRow(), temp_position.getColumn()+1);
+            ChessMove move = new ChessMoveIm(temp_position, end_position, null);
+            while (validMove(end_position, pc)) {
+                valid_moves.add(move);
+                if (blocked_piece) {
+                    break;
+                }
+                if (temp_position.getColumn()+1 <= 8) {
+                    end_position = new ChessPositionIm(end_position.getRow(), end_position.getColumn()+1);
+                    move = new ChessMoveIm(temp_position, end_position, null);
+                }
+            }
+        }
+    }
     public void setPieceType(ChessPosition position){
         int row = position.getRow();
         int col = position.getColumn();
@@ -417,6 +616,47 @@ public class ChessPieceIm implements ChessPiece {
         }
     }
 
+
+    private boolean pawnAttack(ChessPosition temp_position, ChessGame.TeamColor pc){
+        if (temp_position.getColumn() > 8 || temp_position.getRow() > 8){
+            return false;
+        }
+        if (temp_position.getColumn() < 1 || temp_position.getRow() < 1){
+            return false;
+        }
+        if (the_board.getPiece(temp_position) == null){
+            return false;
+        }
+        if (the_board.getPiece(temp_position).getTeamColor() == pc){
+            return false;
+        }
+        if (temp_position.getRow() == 8 || temp_position.getRow() == 1){
+            promotion = true;
+        }
+        return true;
+    }
+    private boolean pawnMove(ChessPosition temp_position, ChessGame.TeamColor pc){
+        if (temp_position.getColumn() > 8 || temp_position.getRow() > 8){
+            return false;
+        }
+        if (temp_position.getColumn() < 1 || temp_position.getRow() < 1){
+            return false;
+        }
+        if (the_board.getPiece(temp_position) == null){
+            if (temp_position.getRow() == 8 || temp_position.getRow() == 1){
+                promotion = true;
+            }
+            return true;
+        }
+        if (the_board.getPiece(temp_position).getTeamColor() == ChessGame.TeamColor.WHITE
+                || the_board.getPiece(temp_position).getTeamColor() == ChessGame.TeamColor.BLACK){
+            return false;
+        }
+        if (temp_position.getRow() == 8 || temp_position.getRow() == 1){
+            promotion = true;
+        }
+        return true;
+    }
     public void setPosition(ChessPosition p){
         position = p;
     }
