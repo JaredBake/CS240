@@ -11,11 +11,19 @@ public class ChessPositionIm implements ChessPosition {
         this.row = row;
         this.column = column;
     }
+
+    public void setRow(int r){
+        row = r;
+    }
     @Override
     public int getRow() {
         return row;
     }
 
+
+    public void setColumn(int c){
+        column = c;
+    }
     @Override
     public int getColumn() {
         return column;

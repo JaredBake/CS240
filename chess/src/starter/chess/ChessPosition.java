@@ -10,12 +10,14 @@ public interface ChessPosition {
      */
     int getRow();
 
+    void setRow(int r);
 
     /**
      * @return which column this position is in
      * 1 codes for the left row
      */
 
+    void setColoumn(int c);
 
     int getColumn();
 
