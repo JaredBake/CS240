@@ -84,6 +84,10 @@ public class ChessPieceIm implements ChessPiece {
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.ROOK){
+                rookD(temp_position,pc,valid_moves);
+                rookL(temp_position,pc,valid_moves);
+                rookR(temp_position,pc,valid_moves);
+                rookU(temp_position,pc,valid_moves);
                 return valid_moves;
             }
         }
