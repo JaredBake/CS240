@@ -13,7 +13,7 @@ public class ChessPieceIm implements ChessPiece {
     private boolean in_stale_mate = false;
     private boolean promotion = false;
     private boolean blocked_piece = false;
-    private 
+    private Set<ChessPosition> live_ones = new HashSet<>();
     private ChessBoard the_board = new ChessBoardIm();
     private ChessGame.TeamColor teamColor;
     private PieceType type;
@@ -54,9 +54,6 @@ public class ChessPieceIm implements ChessPiece {
                 bishopTL(temp_position,pc,valid_moves);
                 bishopBR(temp_position,pc,valid_moves);
                 bishopBL(temp_position,pc,valid_moves);
-                if(valid_moves.contains(new ChessMoveIm(myPosition,pos,null))){
-                    System.out.println("Has the captured piece in it");
-                }
                 return valid_moves;
             }
             if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KNIGHT){
@@ -685,23 +682,32 @@ public class ChessPieceIm implements ChessPiece {
 
 
     public void getAllPieces(ChessBoard b, ChessGame.TeamColor tc){
-        Set<ChessPosition> live_ones = new HashSet<>();
-        ChessPosition k;
         ChessPosition p;
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
                 p = new ChessPositionIm(i,j);
                 if (b.getPiece(p) != null) {
-                    if (b.getPiece(p).getTeamColor() == tc && b.getPiece(p).getPieceType() == PieceType.KING) {
-                        k = new ChessPositionIm(i,j);
-                    }
-                    live_ones.add(new ChessPositionIm(i,j));
+                    live_ones.add(new ChessPositionIm(i+1,j+1));
                 }
             }
         }
     }
     public boolean isInCheck(ChessBoard b, ChessGame.TeamColor tc) {
+        Set<ChessMove> opposing_moves = new HashSet<>();
+        ChessPosition king = new ChessPositionIm(1,1);
         getAllPieces(b,tc);
+        for (ChessPosition p : live_ones){
+            if (b.getPiece(p).getPieceType() == PieceType.KING && tc == b.getPiece(p).getTeamColor()){
+                king = p;
+            }
+            if (tc != b.getPiece(p).getTeamColor()){
+                opposing_moves = new HashSet<>(pieceMoves(b, p));;
+            }
+        }
+        if (opposing_moves.contains(king)){
+            return true;
+        }
+
 
         return false;
     }
