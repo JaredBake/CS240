@@ -8,9 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public class ChessPieceIm implements ChessPiece {
-    private boolean in_check = false;
-    private boolean in_check_mate = false;
-    private boolean in_stale_mate = false;
     private boolean promotion = false;
     private boolean blocked_piece = false;
     private Set<ChessPosition> live_ones = new HashSet<>();
@@ -712,13 +709,4 @@ public class ChessPieceIm implements ChessPiece {
         return false;
     }
 
-
-    public boolean isInCheckmate(ChessBoard b, ChessGame.TeamColor tc) {
-        return false;
-    }
-
-
-    public boolean isInStalemate(ChessBoard b, ChessGame.TeamColor tc) {
-        return false;
-    }
 }

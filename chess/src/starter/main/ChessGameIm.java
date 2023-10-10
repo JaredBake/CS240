@@ -24,12 +24,31 @@ public class ChessGameIm implements ChessGame {
 
 
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> all_moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
         Set<ChessMove> valid_moves = new HashSet<>();
+        boolean piece_removed = false;
+        if (board.getPiece(startPosition) == null){
+            return valid_moves;
+        }
+        Collection<ChessMove> all_moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+        ChessPiece temp_piece = new ChessPieceIm();
         ChessPiece piece = board.getPiece(startPosition);
         TeamColor tc = piece.getTeamColor();
         // Go through each move and see if it will put me in check
         for (ChessMove am: all_moves){
+//            if (isInCheck(tc)){
+//                board.addPiece(am.getEndPosition(),board.getPiece(am.getStartPosition()));
+//                board.addPiece(am.getStartPosition(),null);
+//                if (!isInCheck(tc)){
+//                    valid_moves.add(am);
+//                }
+//                board.addPiece(am.getStartPosition(),board.getPiece(am.getEndPosition()));
+//                board.addPiece(am.getEndPosition(),null);
+//            }
+            piece_removed = false;
+            if (board.getPiece(am.getEndPosition()) != null){
+                temp_piece = board.getPiece(am.getEndPosition());
+                piece_removed = true;
+            }
             board.addPiece(am.getEndPosition(),board.getPiece(am.getStartPosition()));
             board.addPiece(am.getStartPosition(),null);
             if (!isInCheck(tc)){
@@ -37,6 +56,9 @@ public class ChessGameIm implements ChessGame {
             }
             board.addPiece(am.getStartPosition(),board.getPiece(am.getEndPosition()));
             board.addPiece(am.getEndPosition(),null);
+            if (piece_removed){
+                board.addPiece(am.getEndPosition(),temp_piece);
+            }
         }
         return valid_moves;
     }
@@ -44,18 +66,43 @@ public class ChessGameIm implements ChessGame {
 
     @Override
     public void makeMove(ChessMove move) throws InvalidMoveException {
-
-        ChessPosition pos = move.getStartPosition();
-        // Check to see if the king is in danger
-        if (isInCheck(board.getPiece(pos).getTeamColor())){
-            throw new InvalidMoveException("King is in Check");
+        boolean promo = false;
+        if (move.getPromotionPiece() != null){
+            promo = true;
         }
+        Collection<ChessMove> valid_moves = new HashSet<>();
+        valid_moves = validMoves(move.getStartPosition());
+        if (valid_moves.isEmpty()){
+            throw new InvalidMoveException("There are no valid moves");
+        }
+        if (!valid_moves.contains(move)){
+            throw new InvalidMoveException("Piece can't move there");
+        }
+        ChessPosition pos = move.getStartPosition();
+        if (board.getPiece(move.getStartPosition()).getTeamColor() != turn){
+            throw new InvalidMoveException("Not your ture stupid!");
+        }
+        // Check to see if the king is in danger
         board.addPiece(move.getEndPosition(),board.getPiece(move.getStartPosition()));
         board.addPiece(move.getStartPosition(),null);
         pos = move.getEndPosition();
+        if (promo){
+            ChessPiece promoted = new ChessPieceIm(turn,move.getPromotionPiece());
+            board.addPiece(move.getEndPosition(),promoted);
+        }
+        if (turn == TeamColor.WHITE){
+            turn = TeamColor.BLACK;
+        }else{
+            turn = TeamColor.WHITE;
+        }
         if (isInCheck(board.getPiece(pos).getTeamColor())){
+            board.addPiece(move.getStartPosition(),board.getPiece(move.getEndPosition()));
+            board.addPiece(move.getEndPosition(),null);
             throw new InvalidMoveException("Left king in check");
         }
+
+
+
     }
 
     public Collection<ChessMove> getPieceMoves(ChessBoard b, ChessPosition p){
@@ -85,8 +132,7 @@ public class ChessGameIm implements ChessGame {
         all_pieces = getAllPieces(b,tc);
         for (ChessPosition p : all_pieces) {
             if (b.getPiece(p).getPieceType() == ChessPiece.PieceType.KING && tc == b.getPiece(p).getTeamColor()) {
-                king = p;
-                King = king;
+                King = p;
             }
             if (tc != b.getPiece(p).getTeamColor()) {
                 attacking_moves.addAll(b.getPiece(p).pieceMoves(b, p));
@@ -98,12 +144,13 @@ public class ChessGameIm implements ChessGame {
     @Override
     public boolean isInCheck(TeamColor teamColor) {
         Set<ChessMove> attacking_moves = new HashSet<>();
-        ChessPosition king = new ChessPositionIm(1,1);
+//        ChessPosition king = new ChessPositionIm(1,1);
         attacking_moves = getAttacking_moves(board,teamColor);
-        king = King;
         for (ChessMove m: attacking_moves){
-            if (m.getEndPosition().getRow() == king.getRow() && m.getEndPosition().getColumn() == king.getColumn()){
-                return true;
+            if (King != null) {
+                if (m.getEndPosition().getRow() == King.getRow() && m.getEndPosition().getColumn() == King.getColumn()) {
+                    return true;
+                }
             }
         }
         return false;
