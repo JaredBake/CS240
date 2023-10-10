@@ -8,8 +8,12 @@ import java.util.Objects;
 import java.util.Set;
 
 public class ChessPieceIm implements ChessPiece {
+    private boolean in_check = false;
+    private boolean in_check_mate = false;
+    private boolean in_stale_mate = false;
     private boolean promotion = false;
     private boolean blocked_piece = false;
+    private 
     private ChessBoard the_board = new ChessBoardIm();
     private ChessGame.TeamColor teamColor;
     private PieceType type;
@@ -91,8 +95,6 @@ public class ChessPieceIm implements ChessPiece {
                 return valid_moves;
             }
         }
-
-
         return null;
     }
 
@@ -572,6 +574,7 @@ public class ChessPieceIm implements ChessPiece {
             }
         }
     }
+
     public void setPieceType(ChessPosition position){
         int row = position.getRow();
         int col = position.getColumn();
@@ -620,7 +623,6 @@ public class ChessPieceIm implements ChessPiece {
         }
     }
 
-
     private boolean pawnAttack(ChessPosition temp_position, ChessGame.TeamColor pc){
         if (temp_position.getColumn() > 8 || temp_position.getRow() > 8){
             return false;
@@ -661,10 +663,10 @@ public class ChessPieceIm implements ChessPiece {
         }
         return true;
     }
+
     public void setPosition(ChessPosition p){
         position = p;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -673,8 +675,44 @@ public class ChessPieceIm implements ChessPiece {
         return blocked_piece == that.blocked_piece && Objects.equals(the_board, that.the_board) && teamColor == that.teamColor && type == that.type && Objects.equals(position, that.position);
     }
 
+    public ChessPosition getPosition(){
+        return position;
+    }
     @Override
     public int hashCode() {
         return Objects.hash(blocked_piece, the_board, teamColor, type, position);
+    }
+
+
+    public void getAllPieces(ChessBoard b, ChessGame.TeamColor tc){
+        Set<ChessPosition> live_ones = new HashSet<>();
+        ChessPosition k;
+        ChessPosition p;
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                p = new ChessPositionIm(i,j);
+                if (b.getPiece(p) != null) {
+                    if (b.getPiece(p).getTeamColor() == tc && b.getPiece(p).getPieceType() == PieceType.KING) {
+                        k = new ChessPositionIm(i,j);
+                    }
+                    live_ones.add(new ChessPositionIm(i,j));
+                }
+            }
+        }
+    }
+    public boolean isInCheck(ChessBoard b, ChessGame.TeamColor tc) {
+        getAllPieces(b,tc);
+
+        return false;
+    }
+
+
+    public boolean isInCheckmate(ChessBoard b, ChessGame.TeamColor tc) {
+        return false;
+    }
+
+
+    public boolean isInStalemate(ChessBoard b, ChessGame.TeamColor tc) {
+        return false;
     }
 }

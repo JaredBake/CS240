@@ -33,6 +33,7 @@ public class ChessGameIm implements ChessGame {
 
     @Override
     public boolean isInCheck(TeamColor teamColor) {
+
         return false;
     }
 
