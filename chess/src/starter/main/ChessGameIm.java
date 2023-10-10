@@ -190,6 +190,13 @@ public class ChessGameIm implements ChessGame {
 
     @Override
     public boolean isInStalemate(TeamColor teamColor) {
+        Set<ChessMove> all_pieces = getAttacking_moves(board,teamColor);
+        Collection<ChessMove> valid_moves = new HashSet<>();
+
+        valid_moves = validMoves(King);
+        if (valid_moves.isEmpty()){
+            return true;
+        }
         return false;
     }
 
