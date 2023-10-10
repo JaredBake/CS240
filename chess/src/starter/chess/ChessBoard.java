@@ -18,6 +18,12 @@ public interface ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that position
      */
     ChessPiece getPiece(ChessPosition position);
+    /**
+     *
+     * @param position to remove
+     * */
+    void removePiece(ChessPosition position);
+
 
     /**
      * Sets the board to the default starting board

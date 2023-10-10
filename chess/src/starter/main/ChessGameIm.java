@@ -9,7 +9,11 @@ import java.util.Set;
 public class ChessGameIm implements ChessGame {
     TeamColor turn;
     ChessBoard board;
+    ChessPosition King;
     private Set<ChessPosition> live_ones = new HashSet<>();
+    private Set<ChessMove> attacking_moves = new HashSet<>();
+    private Set<ChessMove> attacking_moves2 = new HashSet<>();
+
 
     @Override
     public TeamColor getTeamTurn() {
@@ -55,11 +59,13 @@ public class ChessGameIm implements ChessGame {
         for (ChessPosition p : live_ones) {
             if (board.getPiece(p).getPieceType() == ChessPiece.PieceType.KING && teamColor == board.getPiece(p).getTeamColor()) {
                 king = p;
+                King = king;
             }
             if (teamColor != board.getPiece(p).getTeamColor()) {
-                opposing_moves = new HashSet<>(board.getPiece(p).pieceMoves(board, p));
+                attacking_moves = new HashSet<>(board.getPiece(p).pieceMoves(board, p));
             }
         }
+        opposing_moves = attacking_moves;
         for (ChessMove m: opposing_moves){
             if (m.getEndPosition().getRow() == king.getRow() && m.getEndPosition().getColumn() == king.getColumn()){
                 return true;
@@ -70,10 +76,35 @@ public class ChessGameIm implements ChessGame {
 
     @Override
     public boolean isInCheckmate(TeamColor teamColor) {
+        ChessBoard b = new ChessBoardIm();
+        Set<ChessPosition> enemies = new HashSet<>();
+        Set<ChessMove> king_moves;
         if (!isInCheck(teamColor)){
             return false;
         }
-        
+        for (ChessPosition po: live_ones){
+            b.addPiece(po,board.getPiece(po));
+        }
+        king_moves = new HashSet<>(board.getPiece(King).pieceMoves(board, King));
+        for (ChessMove km: king_moves){
+            if (attacking_moves.contains(km)){
+                return false;
+            }
+            //  the King has been moved to a new position
+            b.addPiece(km.getEndPosition(),b.getPiece(km.getStartPosition()));
+            b.addPiece(km.getStartPosition(),null);
+            // Check to see if the new position is being covered by an enemy
+            getAllPieces(b,teamColor);
+            for (ChessPosition p: live_ones){
+                if (b.getPiece(p).getTeamColor() != teamColor){
+                    enemies.add(p);
+                }
+            }
+            for (ChessPosition ep: enemies){
+
+            }
+//               =
+        }
         return false;
     }
 

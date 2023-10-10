@@ -21,7 +21,6 @@ public class ChessBoardIm implements ChessBoard {
         board[position.getRow()][position.getColumn()] = piece;
     }
 
-    @Override
     public ChessPiece getPiece(ChessPosition position) {
         return board[position.getRow()-1][position.getColumn()-1];
     }
