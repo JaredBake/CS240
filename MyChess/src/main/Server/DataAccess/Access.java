@@ -5,6 +5,9 @@ import Server.Model.User;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *  A database for storing and retrieving the server’s data
  */
@@ -12,6 +15,15 @@ public class Access {
     /**
      * creates a user and checks to see if it has access
      */
+    // Map that contains the information about the users and auth tokens
+    Map<String, String> Data = new HashMap<String, String>()
+    {
+        {
+            put("DuroBake", "114766");
+            put("FastTrack", "soccer23");
+        }
+    };
+
     void CreateUser(User u) throws DataAccessException {
 
     }

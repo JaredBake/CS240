@@ -16,6 +16,11 @@ public class User {
      * unique email for the account
      */
     String email;
+    public User(String password, String username, String email){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
     String GetUserName(){
         return username;
