@@ -22,10 +22,6 @@ public class User {
         this.email = email;
     }
 
-    String GetUserName(){
-        return username;
-    }
-
     public String getUsername() {
         return username;
     }
