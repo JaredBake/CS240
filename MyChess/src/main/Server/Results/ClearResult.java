@@ -1,5 +1,7 @@
 package Server.Results;
 
+import Server.Requests.ClearRequest;
+
 public class ClearResult {
     /**
      * the message returned about the result
@@ -48,4 +50,5 @@ public class ClearResult {
     public void setUsername(String username) {
         this.username = username;
     }
+
 }

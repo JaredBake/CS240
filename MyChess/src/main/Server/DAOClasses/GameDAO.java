@@ -69,5 +69,7 @@ public class GameDAO {
     /**
      * Clears all games from the database
      */
-    void clear() throws DataAccessException{}
+    public void clearAll() {
+        game_map.clear();
+    }
 }

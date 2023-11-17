@@ -24,8 +24,7 @@ public class UserDAO {
     /**
      * Tries to find the desired game from the database by gameID
      */
-    User find(Integer username) throws DataAccessException{
-//TODO: Fix this
+    User find(String username) throws DataAccessException{
         if (users_map.containsKey(username)){
             return users_map.get(username);
         }
@@ -44,6 +43,8 @@ public class UserDAO {
     /**
      * Clears all users from the database
      */
-    void clear() throws DataAccessException{}
+    public void clearAll() throws DataAccessException{
+        users_map.clear();
+    }
 
 }

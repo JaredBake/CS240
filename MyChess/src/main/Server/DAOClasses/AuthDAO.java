@@ -27,5 +27,7 @@ public class AuthDAO {
     /**
      * Clears all authTokens from the database
      */
-    void Clear() throws DataAccessException {}
+    public void clearAll() {
+        auth_map.clear();
+    }
 }

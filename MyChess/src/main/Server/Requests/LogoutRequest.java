@@ -10,8 +10,13 @@ public class LogoutRequest {
      */
     private String password;
     /**
+     * This String holds the email of the user
+     */
+    private String email;
+    /**
      * the request is being sent in using the username and password with this function
      */
+
     public LogoutRequest() {}
 
     // Getters and Setters for username and password properties
@@ -29,5 +34,9 @@ public class LogoutRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }
