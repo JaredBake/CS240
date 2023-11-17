@@ -1,47 +1,33 @@
 package Server.Handlers;
 
 import Server.Model.User;
+import Server.Requests.ClearRequest;
+import Server.Requests.RegisterRequest;
 import Server.Results.LoginResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializer;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import spark.Request;
+import spark.Response;
+import spark.Route;
+import spark.*;
+import java.util.*;
 
-public class Handler {
-    String u = "username:";
-    String p = "password:";
-    String e = "email:";
-
-    /**
-     * Handler needs to interpret a Json into the pieces and then put it back together.
-     */
-    public Handler(){}
+public class Handler implements Route {
 
 
     public String make_a_string(){
-        StringBuilder output = new StringBuilder();
-        String username = "DuroBake";
-        String password = "114766";
-        String email = "a@gmail.com";
-        output.append("{");
-        output.append(u).append(gson.toJson(username)).append(",");
-        output.append(p).append(gson.toJson(password)).append(",");
-        output.append(e).append(gson.toJson(email));
-        output.append("}");
-        String end = output.toString();
-        end = gson.toJson(end);
-        return end;
+        User user = new User("DuroBake", "password","email.com");
+        // Change into a JsonString
+        String user_json = gson.toJson(user);
+        System.out.println(user_json);
+        // Change into a User object from JsonString
+        User user_from_json = gson.fromJson(user_json,User.class);
+        return user_from_json.getUsername();
     }
 
-    public void make_not_a_string(){
-        String output = make_a_string().toString();
-        output = gson.toJson(output);
-        String password = gson.fromJson(jsonString, String.class);
-    }
-
-
+/*
+UUID.randomUUID().toString()
+ */
 
 
 
@@ -52,5 +38,9 @@ public class Handler {
     Gson gson = builder.create();
     LoginResult result = gson.fromJson(jsonString, LoginResult.class);
 
+    @Override
+    public Object handle(Request request, Response response) throws Exception {
+        return null;
+    }
 }
 
