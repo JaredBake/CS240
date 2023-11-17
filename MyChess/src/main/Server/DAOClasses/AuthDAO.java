@@ -17,7 +17,6 @@ public class AuthDAO {
     Map<String, AuthToken> auth_map = new HashMap<>();
 
     public String createToken(String username){
-        String token;
         AuthToken authToken = new AuthToken();
         authToken.setAuthToken(UUID.randomUUID().toString());
         auth_map.put(username,authToken);

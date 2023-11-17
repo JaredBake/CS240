@@ -24,7 +24,7 @@ public class UserDAO {
     /**
      * Tries to find the desired game from the database by gameID
      */
-    User find(String username) throws DataAccessException{
+    public User find(String username) throws DataAccessException{
         if (users_map.containsKey(username)){
             return users_map.get(username);
         }
@@ -35,7 +35,7 @@ public class UserDAO {
     /**
      * Finds all users that have been created
      */
-    HashSet<Game> findAll() throws DataAccessException{
+    public HashSet<Game> findAll() throws DataAccessException{
 
         throw new DataAccessException("There are no users in the DataBase");
     }

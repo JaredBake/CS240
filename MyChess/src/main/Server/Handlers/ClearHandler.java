@@ -1,5 +1,8 @@
 package Server.Handlers;
 
+import Server.DAOClasses.AuthDAO;
+import Server.DAOClasses.GameDAO;
+import Server.DAOClasses.UserDAO;
 import Server.Requests.ClearRequest;
 import Server.Requests.RegisterRequest;
 import Server.Results.ClearResult;
@@ -11,6 +14,9 @@ import spark.Request;
 import spark.Response;
 
 public class ClearHandler extends Handler{
+    public ClearHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
+    }
+
     @Override
     public Object handle(Request request, Response response) throws Exception {
         ClearRequest clearRequest = new Gson().fromJson(request.body(), ClearRequest.class);

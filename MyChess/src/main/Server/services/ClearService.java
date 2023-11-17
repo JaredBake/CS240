@@ -19,7 +19,7 @@ public class ClearService {
         userDAO.clearAll();
         authDAO.clearAll();
         gameDAO.clearAll();
-        
+        // TODO: return the success response 200
         return clearResult;
     }
 }

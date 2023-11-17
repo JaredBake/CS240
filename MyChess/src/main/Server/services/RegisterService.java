@@ -8,9 +8,7 @@ import Server.Results.RegisterResult;
 import dataAccess.DataAccessException;
 
 public class RegisterService {
-    public RegisterResult register(RegisterRequest request) throws DataAccessException {
-        UserDAO userDAO = new UserDAO();
-        AuthDAO authDAO = new AuthDAO();
+    public RegisterResult register(RegisterRequest request, UserDAO userDAO, AuthDAO authDAO) throws DataAccessException {
         // Create a new user to register
         // TODO: Check to make sure the password and username are present
         User user = new User(request.getPassword(),request.getUsername(),request.getEmail());
