@@ -61,7 +61,7 @@ public class Server implements Route {
 
     private Object register(Request request, Response response) {
         RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.register();
+
         return new Gson().toJson(Map.of("name", names));
     }
 
