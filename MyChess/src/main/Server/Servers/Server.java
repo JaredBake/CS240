@@ -1,5 +1,7 @@
 package Server.Servers;
 
+import Server.Handlers.ClearHandler;
+import Server.Handlers.RegisterHandler;
 import Server.Model.User;
 import Server.Requests.ClearRequest;
 import Server.Requests.RegisterRequest;
@@ -30,8 +32,8 @@ public class Server implements Route {
         Spark.externalStaticFileLocation("web");
 
         // Register handlers for each endpoint using the method reference syntax
-        Spark.delete("/db", this::clearApp);
-        Spark.post("/user", this::register);
+        Spark.delete("/db", new ClearHandler());
+        Spark.post("/user", new RegisterHandler());
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
@@ -59,11 +61,11 @@ public class Server implements Route {
         return null;
     }
 
-    private Object register(Request request, Response response) {
-        RegisterRequest registerRequest = new RegisterRequest();
-
-        return new Gson().toJson(Map.of("name", names));
-    }
+//    private Object register(Request request, Response response) {
+//        RegisterHandler reg_handler = new RegisterHandler();
+//        reg_handler.setUsername(request.params(":name"));
+//        return new Gson().toJson(Map.of("name", names));
+//    }
 
     private Object clearApp(Request request, Response response) {
         return null;

@@ -12,7 +12,7 @@ import spark.Route;
 import spark.*;
 import java.util.*;
 
-public class Handler implements Route {
+public abstract class Handler implements Route {
 
 
     public String make_a_string(){
@@ -38,9 +38,5 @@ UUID.randomUUID().toString()
     Gson gson = builder.create();
     LoginResult result = gson.fromJson(jsonString, LoginResult.class);
 
-    @Override
-    public Object handle(Request request, Response response) throws Exception {
-        return null;
-    }
 }
 

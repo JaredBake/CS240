@@ -1,6 +1,6 @@
 chess
 dataAccess
-Server.DataAccess
+Server.DAOClasses
 Server.Model
 Server.Requests
 Server.Results
