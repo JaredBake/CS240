@@ -1,21 +1,34 @@
 package Server.Requests;
 
 public class RegisterRequest {
+    /**
+     * unique username for the account
+     */
     private String username;
+    /**
+     * password for the unique username
+     */
     private String password;
-    private String email;
-    public RegisterRequest(){}
+    /**
+     * the request is being sent in using the username and password with this function
+     */
+    public RegisterRequest() {}
 
+    // Getters and Setters for username and password properties
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public String getEmail() {
-        return email;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }
