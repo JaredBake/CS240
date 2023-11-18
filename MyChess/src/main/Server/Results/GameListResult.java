@@ -7,6 +7,10 @@ import java.util.ArrayList;
 
 public class GameListResult {
     /**
+     * Variable for gameID
+     */
+    private String gameID;
+    /**
      * the message returned about the result
      */
     private String message;
@@ -23,6 +27,9 @@ public class GameListResult {
     public String getMessage() {
         return message;
     }
+    public void setGameListNull(){
+        game_list = null;
+    }
 
 
     public void setMessage(String message) {
@@ -33,7 +40,7 @@ public class GameListResult {
         game_list.addAll(gameList);
     }
 
-    public ArrayList<Game> getGame_list(){
+    public ArrayList<Game> getGame_list() {
         return game_list;
     }
 

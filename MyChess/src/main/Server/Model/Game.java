@@ -68,4 +68,8 @@ public class Game {
     public void setGame(ChessGame game) {
         this.game = game;
     }
+
+    public void setGameID(String gameID) {
+        this.gameID = gameID;
+    }
 }

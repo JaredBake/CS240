@@ -16,6 +16,7 @@ public class GameListService {
             authDAO.verifyToken(request.getAuthToken());
         }catch (DataAccessException wrong_info){
             gameListResult.setMessage(wrong_info.getMessage());
+            gameListResult.setGameListNull();
             return gameListResult;
         }
         gameListResult.addGameList(gameDAO.getGameList());

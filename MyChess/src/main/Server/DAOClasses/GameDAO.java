@@ -29,6 +29,7 @@ public class GameDAO {
         game.setGameName(game_name);
         game.setBlackUsername("Empty");
         game.setWhiteUsername("Empty");
+        game.setGameID(gameID);
         game_map.put(gameID,game);
         return gameID;
     }
@@ -88,11 +89,12 @@ public class GameDAO {
         game_map.clear();
     }
 
-    public ArrayList<Game> getGameList() {
+    public ArrayList<Game> getGameList(){
         ArrayList<Game> gameList = new ArrayList<>();
         for (String ID: game_map.keySet()){
             gameList.add(game_map.get(ID));
         }
         return gameList;
     }
+
 }
