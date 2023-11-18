@@ -5,6 +5,7 @@ import Server.Model.User;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class GameDAO {
     /**
      * Tries to find the desired game from the database by gameID
      */
-    Game find(Integer gameID) throws DataAccessException{
+    public Game find(String gameID) throws DataAccessException{
         if (game_map.containsKey(gameID)){
             return game_map.get(gameID);
         }
@@ -46,7 +47,7 @@ public class GameDAO {
     /**
      * Finds all games that have been created
      */
-    Map<String,Game> findAll() throws DataAccessException{
+    public Map<String,Game> findAll() throws DataAccessException{
         if (!game_map.isEmpty()) {
             return game_map;
         }
@@ -57,7 +58,7 @@ public class GameDAO {
     /**
      * Claims a spot in the game and saves the color of team
      */
-    void claimSpot(User user, Game game) throws DataAccessException{
+    public void claimSpot(User user, Game game) throws DataAccessException{
         if (!(game.getBlackUsername() == null)){
             game.setBlackUsername(user.getUsername());
         }else if(!game.getBlackUsername().equals(user.getUsername())){
@@ -72,18 +73,26 @@ public class GameDAO {
      * Updates the game in the database replaces the chessGame string
      * with a new one
      */
-    void updateGame() throws DataAccessException{}
+    public void updateGame() throws DataAccessException{}
 
 
     /**
      * Deletes a game from the database
      */
-    void remove() throws DataAccessException{}
+    public void remove() throws DataAccessException{}
 
     /**
      * Clears all games from the database
      */
     public void clearAll() {
         game_map.clear();
+    }
+
+    public ArrayList<Game> getGameList() {
+        ArrayList<Game> gameList = new ArrayList<>();
+        for (String ID: game_map.keySet()){
+            gameList.add(game_map.get(ID));
+        }
+        return gameList;
     }
 }

@@ -4,7 +4,7 @@ public class CreateRequest {
     /**
      * unique username for the account
      */
-    private String game_name;
+    private String gameName;
     /**
      * authToken for the unique username
      */
@@ -13,11 +13,11 @@ public class CreateRequest {
 
     // Getters and Setters for username and password properties
     public String getGameName() {
-        return game_name;
+        return gameName;
     }
 
     public void setGameName(String username) {
-        this.game_name = username;
+        this.gameName = username;
     }
 
     public String getAuthToken() {

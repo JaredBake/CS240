@@ -10,7 +10,7 @@ public class Game {
     /**
      * unique game identifier
      */
-    int gameID;
+    String gameID;
     /**
      * unique username of white team
      */
@@ -29,16 +29,11 @@ public class Game {
     ChessGame game;
 
     public Game(){
-        gameID = 0;
+        gameID = null;
         whiteUsername = null;
         blackUsername = null;
         gameName = null;
         game = null;
-
-    }
-
-    public int getGameID() {
-        return gameID;
     }
 
     public String getWhiteUsername() {
@@ -57,9 +52,6 @@ public class Game {
         return game;
     }
 
-    public void setGameID(int gameID) {
-        this.gameID = gameID;
-    }
 
     public void setWhiteUsername(String whiteUsername) {
         this.whiteUsername = whiteUsername;
