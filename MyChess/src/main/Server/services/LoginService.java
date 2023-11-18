@@ -17,14 +17,12 @@ public class LoginService {
      * function to access the login requests
      */
     public LoginResult login(LoginRequest request, UserDAO userDAO, AuthDAO authDAO) throws DataAccessException {
-
         // Login the User
-        // TODO: Check to make sure the password and username match what is in the DAO
         User user = null;
         LoginResult loginResult = new LoginResult();
         // Check for errors
         try{
-            user = userDAO.find(request.getUsername());
+            user = userDAO.find(request.getUsername(), request.getPassword());
         }catch (DataAccessException wrong_info){
             loginResult.setMessage(wrong_info.getMessage());
             return loginResult;

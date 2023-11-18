@@ -33,8 +33,11 @@ public class UserDAO {
     /**
      * Tries to find the desired user from the database by username
      */
-    public User find(String username) throws DataAccessException{
+    public User find(String username, String password) throws DataAccessException{
         if (users_map.containsKey(username)){
+            if (!users_map.get(username).getPassword().equals(password)) {
+                throw new DataAccessException("Error: unauthorized");
+            }
             return users_map.get(username);
         }
         throw new DataAccessException("Error: unauthorized");

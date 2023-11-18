@@ -32,16 +32,16 @@ public class AuthDAO {
     }
 
     public boolean verifyToken(String token) throws DataAccessException {
-//        AuthToken authToken = new AuthToken();
-//        authToken.setAuthToken(token);
         if (auth_map.containsKey(token)){
             return true;
         }else{
             throw new DataAccessException("Error: unauthorized");
         }
-
     }
 
+    public AuthToken getAuthToken(String token){
+        return auth_map.get(token);
+    }
     public void deleteToken(String authToken) {
         auth_map.remove(authToken);
     }

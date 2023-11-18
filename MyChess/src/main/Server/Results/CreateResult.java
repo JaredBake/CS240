@@ -10,9 +10,10 @@ public class CreateResult {
      */
     private String authToken;
     /**
-     * unique username returned with result
+     *  Variable to hold the GameID
      */
-    private String username;
+    private String gameID;
+
     /**
      * A function that returns the result of the login attempt
      */
@@ -21,9 +22,6 @@ public class CreateResult {
     /**
      * Getters and Setters for message, authToken, and username properties
      */
-    public String getToken(){
-        return null;
-    }
 
     public String getMessage() {
         return message;
@@ -31,10 +29,6 @@ public class CreateResult {
 
     public String getAuthToken() {
         return authToken;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public void setMessage(String message) {
@@ -45,7 +39,11 @@ public class CreateResult {
         this.authToken = authToken;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getGameID() {
+        return gameID;
+    }
+
+    public void setGameID(String gameID) {
+        this.gameID = gameID;
     }
 }

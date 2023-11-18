@@ -2,20 +2,34 @@ package Server.DAOClasses;
 
 import Server.Model.Game;
 import Server.Model.User;
+import chess.ChessGame;
 import dataAccess.DataAccessException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class GameDAO {
-    private Map<Integer, Game> game_map = new HashMap<>();
+    private Map<String, Game> game_map = new HashMap<>();
 
     /**
      * method for inserting a new game into the database.
      */
-    void Insert(Game game) throws DataAccessException {
+    public void insert(Game game) throws DataAccessException {
 
+    }
 
+    /**
+     * Method for creating a new game with a unique gameID
+     */
+    public String create(String game_name){
+        String gameID = UUID.randomUUID().toString();
+        Game game = new Game();
+        game.setGameName(game_name);
+        game.setBlackUsername("Empty");
+        game.setWhiteUsername("Empty");
+        game_map.put(gameID,game);
+        return gameID;
     }
 
     /**
@@ -32,7 +46,7 @@ public class GameDAO {
     /**
      * Finds all games that have been created
      */
-    Map<Integer,Game> findAll() throws DataAccessException{
+    Map<String,Game> findAll() throws DataAccessException{
         if (!game_map.isEmpty()) {
             return game_map;
         }
