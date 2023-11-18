@@ -15,20 +15,29 @@ public class UserDAO {
 
 
     public void createUser(User user) throws DataAccessException {
+        /**
+         * Checks to see if the username is already being used and checks to make sure there
+         * is a username and password before creating a new user and authToken
+         */
+        if (user.getUsername().isEmpty() || user.getPassword().isEmpty()
+        || user.getPassword().isBlank() || user.getUsername().isBlank()){
+            throw new DataAccessException("Error: bad request");
+        }
         if (users_map.containsKey(user.getUsername())){
             throw new DataAccessException("Error: already taken");
         }
         users_map.put(user.getUsername(),user);
+        //throw new DataAccessException("Error: description");
     }
 
     /**
-     * Tries to find the desired game from the database by gameID
+     * Tries to find the desired user from the database by username
      */
     public User find(String username) throws DataAccessException{
         if (users_map.containsKey(username)){
             return users_map.get(username);
         }
-        throw new DataAccessException("Could not find user");
+        throw new DataAccessException("Error: unauthorized");
     }
 
 

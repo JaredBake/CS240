@@ -16,8 +16,9 @@ public class CreateHandler extends Handler{
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-        RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
-        RegisterResult registerResult = new RegisterService().register(registerRequest);
-        return new Gson().toJson(registerResult);
+//        RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
+//        RegisterResult registerResult = new RegisterService().register(registerRequest);
+//        return new Gson().toJson(registerResult);
+        return null;
     }
 }

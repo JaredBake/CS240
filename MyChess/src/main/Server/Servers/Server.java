@@ -40,7 +40,7 @@ public class Server implements Route {
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
         Spark.post("/user", new RegisterHandler(userDAO, authDAO));
         Spark.post("/session", new LoginHandler(userDAO, authDAO));
-        Spark.delete("/session", new LogoutHandler(userDAO, authDAO));
+        Spark.delete("/session", new LogoutHandler(authDAO));
         Spark.get("/game", new GameListHandler(authDAO, gameDAO));
         Spark.post("/game", new CreateHandler(userDAO, authDAO, gameDAO));
         Spark.put("/game", new JoinHandler(userDAO, authDAO, gameDAO));

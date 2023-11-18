@@ -13,8 +13,14 @@ public class RegisterService {
         // TODO: Check to make sure the password and username are present
         User user = new User(request.getPassword(),request.getUsername(),request.getEmail());
         RegisterResult registerResult = new RegisterResult();
-        userDAO.createUser(user);
-        // Create and set the variables for registerResult
+        // If username is already used set error message
+        try {
+            userDAO.createUser(user);
+        }catch (DataAccessException wrong_username){
+            registerResult.setMessage(wrong_username.getMessage());
+            return registerResult;
+        }
+            // Create and set the variables for registerResult
         registerResult.setAuthToken(authDAO.createToken(user.getUsername()));
         registerResult.setUsername(user.getUsername());
         return registerResult;

@@ -19,7 +19,8 @@ public class AuthDAO {
     public String createToken(String username){
         AuthToken authToken = new AuthToken();
         authToken.setAuthToken(UUID.randomUUID().toString());
-        auth_map.put(username,authToken);
+        authToken.setUsername(username);
+        auth_map.put(authToken.getAuthToken(),authToken);
         return authToken.getAuthToken();
     }
 
@@ -28,5 +29,20 @@ public class AuthDAO {
      */
     public void clearAll() {
         auth_map.clear();
+    }
+
+    public boolean verifyToken(String token) throws DataAccessException {
+//        AuthToken authToken = new AuthToken();
+//        authToken.setAuthToken(token);
+        if (auth_map.containsKey(token)){
+            return true;
+        }else{
+            throw new DataAccessException("Error: unauthorized");
+        }
+
+    }
+
+    public void deleteToken(String authToken) {
+        auth_map.remove(authToken);
     }
 }
