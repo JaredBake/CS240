@@ -59,4 +59,9 @@ public class UserDAO {
         users_map.clear();
     }
 
+    public void checkRegister(String username) throws DataAccessException{
+        if (users_map.containsKey(username)){
+            throw new DataAccessException("Error: already taken");
+        }
+    }
 }

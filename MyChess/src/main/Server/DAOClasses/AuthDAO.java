@@ -3,6 +3,7 @@ package Server.DAOClasses;
 import Server.Model.AuthToken;
 import dataAccess.DataAccessException;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -45,4 +46,14 @@ public class AuthDAO {
     public void deleteToken(String authToken) {
         auth_map.remove(authToken);
     }
+
+    public String findUser(String authToken) throws DataAccessException{
+        for (String user: auth_map.keySet()){
+            if (auth_map.get(user).getAuthToken().equals(authToken)){
+                return user;
+            }
+        }
+        throw new DataAccessException("Error: unathorized");
+    }
+
 }

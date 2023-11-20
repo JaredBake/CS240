@@ -9,6 +9,12 @@ public class JoinRequest {
      * password for the unique username
      */
     private String password;
+    // Holds the authToken
+    private String authToken;
+    // Holds the requested player color for the game WHITE/BLACK
+    private String playerColor;
+    // Holds the gameID
+    private Integer gameID;
     /**
      * the request is being sent in using the username and password with this function
      */
@@ -29,5 +35,20 @@ public class JoinRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setAuthToken(String authorization) {
+        authToken = authorization;
+    }
+
+    public String getPlayerColor() {
+        return playerColor;
+    }
+    public Integer getGameID(){
+        return gameID;
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 }

@@ -20,6 +20,15 @@ public class RegisterHandler extends Handler {
     public Object handle(Request request, Response response) throws Exception {
         RegisterRequest registerRequest = new Gson().fromJson(request.body(), RegisterRequest.class);
         RegisterResult registerResult = new RegisterService().register(registerRequest, userDAO, authDAO);
+        if (registerResult.getMessage() == null){
+            response.status(200);
+        } else if (registerResult.getMessage().equals("Error: bad request")) {
+            response.status(400);
+        }else if (registerResult.getMessage().equals("Error: already taken")) {
+            response.status(403);
+        }else {
+            response.status(500);
+        }
         return new Gson().toJson(registerResult);
     }
 

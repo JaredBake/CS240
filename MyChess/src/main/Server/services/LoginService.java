@@ -10,7 +10,7 @@ import dataAccess.DataAccessException;
 import javax.xml.crypto.Data;
 
 /**
- * Class to get use in information given to login
+ * Class to get use in information given to login.
  */
 public class LoginService {
     /**
@@ -25,6 +25,7 @@ public class LoginService {
             user = userDAO.find(request.getUsername(), request.getPassword());
         }catch (DataAccessException wrong_info){
             loginResult.setMessage(wrong_info.getMessage());
+
             return loginResult;
         }
         // Create and set the variables for registerResult

@@ -12,7 +12,7 @@ public class CreateResult {
     /**
      *  Variable to hold the GameID
      */
-    private String gameID;
+    private Integer gameID;
 
     /**
      * A function that returns the result of the login attempt
@@ -39,11 +39,11 @@ public class CreateResult {
         this.authToken = authToken;
     }
 
-    public String getGameID() {
+    public Integer getGameID() {
         return gameID;
     }
 
-    public void setGameID(String gameID) {
+    public void setGameID(Integer gameID) {
         this.gameID = gameID;
     }
 }

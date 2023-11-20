@@ -2,6 +2,7 @@ package Server.DAOClasses;
 
 import Server.Model.Game;
 import Server.Model.User;
+import Server.Requests.JoinRequest;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GameDAO {
-    private Map<String, Game> game_map = new HashMap<>();
+    private Map<Integer, Game> game_map = new HashMap<>();
 
     /**
      * method for inserting a new game into the database.
@@ -23,12 +24,12 @@ public class GameDAO {
     /**
      * Method for creating a new game with a unique gameID
      */
-    public String create(String game_name){
-        String gameID = UUID.randomUUID().toString();
+    public Integer create(String game_name){
+        Integer gameID = UUID.randomUUID().hashCode();
         Game game = new Game();
         game.setGameName(game_name);
-        game.setBlackUsername("Empty");
-        game.setWhiteUsername("Empty");
+        game.setBlackUsername("empty");
+        game.setWhiteUsername("empty");
         game.setGameID(gameID);
         game_map.put(gameID,game);
         return gameID;
@@ -37,18 +38,18 @@ public class GameDAO {
     /**
      * Tries to find the desired game from the database by gameID
      */
-    public Game find(String gameID) throws DataAccessException{
+    public Game find(Integer gameID) throws DataAccessException{
         if (game_map.containsKey(gameID)){
             return game_map.get(gameID);
         }
-        throw new DataAccessException("Could not find Game");
+        throw new DataAccessException("Error: bad request");
     }
 
 
     /**
      * Finds all games that have been created
      */
-    public Map<String,Game> findAll() throws DataAccessException{
+    public Map<Integer,Game> findAll() throws DataAccessException{
         if (!game_map.isEmpty()) {
             return game_map;
         }
@@ -56,18 +57,7 @@ public class GameDAO {
     }
 
 
-    /**
-     * Claims a spot in the game and saves the color of team
-     */
-    public void claimSpot(User user, Game game) throws DataAccessException{
-        if (!(game.getBlackUsername() == null)){
-            game.setBlackUsername(user.getUsername());
-        }else if(!game.getBlackUsername().equals(user.getUsername())){
-            game.setWhiteUsername(user.getUsername());
-        }else{
-            throw new DataAccessException("You can't play for both teams dummy");
-        }
-    }
+
 
 
     /**
@@ -91,10 +81,32 @@ public class GameDAO {
 
     public ArrayList<Game> getGameList(){
         ArrayList<Game> gameList = new ArrayList<>();
-        for (String ID: game_map.keySet()){
+        for (Integer ID: game_map.keySet()){
             gameList.add(game_map.get(ID));
         }
         return gameList;
     }
 
+    public void observeGame(JoinRequest joinRequest, UserDAO userDAO) throws DataAccessException {
+
+    }
+    /**
+     * Claims a spot in the game and saves the color of team
+     */
+    public void claimSpot(String username, Integer gameID, String playerColor) throws DataAccessException {
+        Game game = game_map.get(gameID);
+        if (playerColor.equals("Black")){
+            if (game.getBlackUsername().equals("empty")) {
+                game.setBlackUsername(username);
+            }else {
+                throw new DataAccessException("Error: already taken");
+            }
+        }else {
+            if (game.getWhiteUsername().equals("empty")) {
+                game.setWhiteUsername(username);
+            }else {
+                throw new DataAccessException("Error: already taken");
+            }
+        }
+    }
 }

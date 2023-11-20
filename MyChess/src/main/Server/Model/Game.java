@@ -10,7 +10,7 @@ public class Game {
     /**
      * unique game identifier
      */
-    String gameID;
+    Integer gameID;
     /**
      * unique username of white team
      */
@@ -69,7 +69,7 @@ public class Game {
         this.game = game;
     }
 
-    public void setGameID(String gameID) {
+    public void setGameID(Integer gameID) {
         this.gameID = gameID;
     }
 }
