@@ -26,6 +26,9 @@ public class GameDAO {
      */
     public Integer create(String game_name){
         Integer gameID = UUID.randomUUID().hashCode();
+        if (gameID < 0){
+            gameID = gameID * -1;
+        }
         Game game = new Game();
         game.setGameName(game_name);
         game.setBlackUsername("empty");

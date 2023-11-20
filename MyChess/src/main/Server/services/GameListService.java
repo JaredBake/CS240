@@ -19,7 +19,9 @@ public class GameListService {
             gameListResult.setGameListNull();
             return gameListResult;
         }
-        gameListResult.addGameList(gameDAO.getGameList());
+        if (gameDAO.getGameList() != null){
+            gameListResult.addGameList(gameDAO.getGameList());
+        }
         return gameListResult;
     }
 }
