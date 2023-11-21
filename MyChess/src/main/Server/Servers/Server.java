@@ -46,63 +46,6 @@ public class Server implements Route {
         Spark.put("/game", new JoinHandler(userDAO, authDAO, gameDAO));
     }
 
-
-//    private Object joinGame(Request request, Response response) {
-//        return null;
-//    }
-//
-//    private Object creatGame(Request request, Response response) {
-//        return null;
-//    }
-//
-//    private Object listGames(Request request, Response response) {
-//        return null;
-//    }
-//
-//    private Object logout(Request request, Response response) {
-//        return null;
-//    }
-//
-//    private Object login(Request request, Response response) {
-//        return null;
-//    }
-//
-//    private Object register(Request request, Response response) {
-//        RegisterHandler reg_handler = new RegisterHandler();
-//        reg_handler.setUsername(request.params(":name"));
-//        return new Gson().toJson(Map.of("name", names));
-//    }
-//
-//    private Object clearApp(Request request, Response response) {
-//        return null;
-//    }
-//
-//    private Object addName(Request req, Response res) {
-//        names.add(req.params(":name"));
-//        return listNames(req, res);
-//    }
-//
-//    private Object listNames(Request req, Response res) {
-//        res.type("application/json");
-//        return new Gson().toJson(Map.of("name", names));
-//    }
-//
-//    private Object deleteName(Request req, Response res) {
-//        names.remove(req.params(":name"));
-//        return listNames(req, res);
-//    }
-//
-//
-//    public String make_a_string(){
-//        User user = new User("DuroBake", "password","email.com");
-//        // Change into a JsonString
-//        String user_json = gson.toJson(user);
-//        System.out.println(user_json);
-//        // Change into a User object from JsonString
-//        User user_from_json = gson.fromJson(user_json,User.class);
-//        return user_from_json.getUsername();
-//    }
-
 /*
 UUID.randomUUID().toString()
  */

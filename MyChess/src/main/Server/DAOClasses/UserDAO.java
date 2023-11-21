@@ -48,8 +48,8 @@ public class UserDAO {
      * Finds all users that have been created
      */
     public Integer findAll(){
-        if (!users_map.isEmpty()){
-            return users_map.size();
+        if (!users_map.keySet().isEmpty()){
+            return users_map.keySet().size();
         }else {
             return 0;
         }
