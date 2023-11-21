@@ -48,12 +48,10 @@ public class AuthDAO {
     }
 
     public String findUser(String authToken) throws DataAccessException{
-        for (String user: auth_map.keySet()){
-            if (auth_map.get(user).getAuthToken().equals(authToken)){
-                return user;
-            }
-        }
-        throw new DataAccessException("Error: unathorized");
+       if (auth_map.containsKey(authToken)){
+           return auth_map.get(authToken).getUsername();
+       }
+       throw new DataAccessException("Error: unauthorized");
     }
 
 }

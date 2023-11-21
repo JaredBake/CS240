@@ -31,8 +31,6 @@ public class GameDAO {
         }
         Game game = new Game();
         game.setGameName(game_name);
-        game.setBlackUsername("empty");
-        game.setWhiteUsername("empty");
         game.setGameID(gameID);
         game_map.put(gameID,game);
         return gameID;
@@ -98,18 +96,20 @@ public class GameDAO {
      */
     public void claimSpot(String username, Integer gameID, String playerColor) throws DataAccessException {
         Game game = game_map.get(gameID);
-        if (playerColor.equals("Black")){
-            if (game.getBlackUsername().equals("empty")) {
+        if (playerColor.equals("BLACK")){
+            if (game.getBlackUsername() == null) {
                 game.setBlackUsername(username);
             }else {
                 throw new DataAccessException("Error: already taken");
             }
-        }else {
-            if (game.getWhiteUsername().equals("empty")) {
+        }else if (playerColor.equals("WHITE")){
+            if (game.getWhiteUsername() == null) {
                 game.setWhiteUsername(username);
             }else {
                 throw new DataAccessException("Error: already taken");
             }
+        }else{
+            throw new DataAccessException("Error: bad request");
         }
     }
 }

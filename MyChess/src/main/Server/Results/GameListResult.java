@@ -2,7 +2,6 @@ package Server.Results;
 
 import Server.Model.Game;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class GameListResult {
@@ -18,7 +17,7 @@ public class GameListResult {
     /**
      * List of games
      */
-    private ArrayList<Game> game_list = new ArrayList<>();
+    private ArrayList<Game> games = new ArrayList<>();
     public GameListResult() {}
 
     /**
@@ -28,7 +27,7 @@ public class GameListResult {
         return message;
     }
     public void setGameListNull(){
-        game_list = null;
+        games = null;
     }
 
 
@@ -37,11 +36,11 @@ public class GameListResult {
     }
 
     public void addGameList(ArrayList<Game> gameList){
-        game_list.addAll(gameList);
+        games.addAll(gameList);
     }
 
-    public ArrayList<Game> getGame_list() {
-        return game_list;
+    public ArrayList<Game> getGames() {
+        return games;
     }
 
 }

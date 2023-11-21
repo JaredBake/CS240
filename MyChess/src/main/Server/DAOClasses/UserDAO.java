@@ -47,9 +47,12 @@ public class UserDAO {
     /**
      * Finds all users that have been created
      */
-    public HashSet<Game> findAll() throws DataAccessException{
-
-        throw new DataAccessException("There are no users in the DataBase");
+    public Integer findAll(){
+        if (!users_map.isEmpty()){
+            return users_map.size();
+        }else {
+            return 0;
+        }
     }
 
     /**
