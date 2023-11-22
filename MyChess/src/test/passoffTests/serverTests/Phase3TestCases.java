@@ -4,13 +4,13 @@ import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
 import Server.Handlers.CreateHandler;
-import Server.Requests.CreateRequest;
+import Server.Model.Game;
+import Server.Requests.*;
+import Server.Results.*;
+import Server.services.*;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import org.junit.jupiter.api.*;
-import passoffTests.TestFactory;
-import passoffTests.obfuscatedTestClasses.TestServerFacade;
-import passoffTests.testClasses.TestModels;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,356 +18,264 @@ import java.util.HashSet;
 import java.util.Locale;
 
 public class Phase3TestCases {
-
-    private static final int HTTP_OK = 200;
-    private static final int HTTP_BAD_REQUEST = 400;
-    private static final int HTTP_UNAUTHORIZED = 401;
-    private static final int HTTP_FORBIDDEN = 403;
-
-    private static TestModels.TestUser existingUser;
-    private static TestModels.TestUser newUser;
-    private static TestModels.TestCreateRequest createRequest;
-    private static TestServerFacade serverFacade;
     private String existingAuth;
     private UserDAO userDAO = new UserDAO();
-
-
-    @BeforeAll
-    public static void init() {
-        existingUser = new TestModels.TestUser();
-        existingUser.username = "Jared";
-        existingUser.password = "Bake";
-        existingUser.email = "urim@thummim.net";
-
-
-        newUser = new TestModels.TestUser();
-        newUser.username = "testUsername";
-        newUser.password = "testPassword";
-        newUser.email = "testEmail";
-
-        createRequest = new TestModels.TestCreateRequest();
-        createRequest.gameName = "testGame";
-
-        serverFacade = new TestServerFacade("localhost", TestFactory.getServerPort());
-    }
+    private GameDAO gameDAO = new GameDAO();
+    private AuthDAO authDAO = new AuthDAO();
+    String username = "jared";
+    String password = "mypass";
+    String email = "email.com";
+    Integer gameID;
 
 
     @BeforeEach
-    public void setup() {
-        serverFacade.clear();
-
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = existingUser.username;
-        registerRequest.password = existingUser.password;
-        registerRequest.email = existingUser.email;
-
-        //one user already logged in
-        TestModels.TestLoginRegisterResult regResult = serverFacade.register(registerRequest);
-        existingAuth = regResult.authToken;
+    public void setup() throws DataAccessException {
+        ClearRequest clearRequest = new ClearRequest();
+        ClearService clearService = new ClearService();
+        clearService.clear(clearRequest, userDAO, authDAO, gameDAO);
+        existingAuth = authDAO.createToken(username);
+        // Create a test User
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername(username);
+        registerRequest.setPassword(password);
+        registerRequest.setEmail(email);
+        RegisterResult registerResult = new RegisterService().register(registerRequest,userDAO,authDAO);
+        // Create a test Game
+        CreateRequest createRequest = new CreateRequest();
+        createRequest.setAuthToken(existingAuth);
+        createRequest.setGameName("TestGame");
+        CreateResult createResult = new CreateService().createGame(createRequest,userDAO,authDAO,gameDAO);
+        gameID = createResult.getGameID();
     }
-
 
     @Test
     @Order(1)
-    @DisplayName("Normal User Login")
-    public void successLogin() {
-        TestModels.TestLoginRequest loginRequest = new TestModels.TestLoginRequest();
-        loginRequest.username = existingUser.username;
-        loginRequest.password = existingUser.password;
-
-        TestModels.TestLoginRegisterResult loginResult = serverFacade.login(loginRequest);
-
-        Assertions.assertEquals(HTTP_OK, serverFacade.getStatusCode(), "Server response code was not 200 OK");
-        Assertions.assertTrue(loginResult.success, "Response returned not successful");
-        Assertions.assertFalse(
-                loginResult.message != null && loginResult.message.toLowerCase(Locale.ROOT).contains("error"),
-                "Response returned error message");
-        Assertions.assertEquals(existingUser.username, loginResult.username,
-                "Response did not give the same username as user");
-        Assertions.assertNotNull(loginResult.authToken, "Response did not return authentication String");
+    @DisplayName("Normal User Registration")
+    public void successRegister() throws DataAccessException{
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("Emmiy");
+        registerRequest.setPassword("passess");
+        registerRequest.setEmail(email);
+        Integer before;
+        Integer after;
+        before = userDAO.findAll();
+        RegisterResult registerResult = new RegisterService().register(registerRequest,userDAO,authDAO);
+        after = userDAO.findAll();
+        // Test registration
+        Assertions.assertNotEquals(before, after, "Did not add user to registration list");
     }
 
+
+    @Test
+    @Order(2)
+    @DisplayName("Register Bad Request")
+    public void failRegister() throws DataAccessException{
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("OtherName");
+        registerRequest.setPassword(null);
+        registerRequest.setEmail(email);
+        Integer before;
+        Integer after;
+        before = userDAO.findAll();
+        RegisterResult registerResult = new RegisterService().register(registerRequest,userDAO,authDAO);
+        after = userDAO.findAll();
+        // Test registration
+        Assertions.assertEquals(before, after, "Added when shouldn't have added");
+    }
     @Test
     @Order(3)
-    @DisplayName("Login Wrong Password")
-    public void loginWrongPassword() {
-        TestModels.TestLoginRequest loginRequest = new TestModels.TestLoginRequest();
-        loginRequest.username = existingUser.username;
-        loginRequest.password = newUser.password;
+    @DisplayName("Normal User Login")
+    public void successLogin() throws DataAccessException {
+        Integer before;
+        Integer after;
 
-        TestModels.TestLoginRegisterResult loginResult = serverFacade.login(loginRequest);
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setPassword(password);
+        loginRequest.setUsername(username);
+        before = authDAO.listSize();
 
-        Assertions.assertEquals(HTTP_UNAUTHORIZED, serverFacade.getStatusCode(),
-                "Server response code was not 401 Unauthorized");
-        Assertions.assertFalse(loginResult.success, "Response didn't return not successful");
-        Assertions.assertTrue(loginResult.message.toLowerCase(Locale.ROOT).contains("error"),
-                "Response missing error message");
-        Assertions.assertNull(loginResult.username, "Response incorrectly returned username");
-        Assertions.assertNull(loginResult.authToken, "Response incorrectly return authentication String");
+        LoginResult loginResult = new LoginService().login(loginRequest, userDAO, authDAO);
+
+        after = authDAO.listSize();
+        Assertions.assertNotEquals(before, after, "User was not added correctly");
     }
 
 
     @Test
     @Order(4)
-    @DisplayName("Unique Authtoken Each Login")
-    public void uniqueAuthorizationTokens() {
-        TestModels.TestLoginRequest loginRequest = new TestModels.TestLoginRequest();
-        loginRequest.username = existingUser.username;
-        loginRequest.password = existingUser.password;
+    @DisplayName("Login Wrong Username")
+    public void loginWrongPassword() throws DataAccessException{
+        Integer before;
+        Integer after;
 
-        TestModels.TestLoginRegisterResult loginOne = serverFacade.login(loginRequest);
-        Assertions.assertEquals(HTTP_OK, serverFacade.getStatusCode(), "Server response code was not 200 OK");
-        Assertions.assertNotNull(loginOne.authToken, "Login result did not contain an authToken");
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setPassword(password);
+        loginRequest.setUsername("");
+        before = authDAO.listSize();
 
-        TestModels.TestLoginRegisterResult loginTwo = serverFacade.login(loginRequest);
-        Assertions.assertEquals(HTTP_OK, serverFacade.getStatusCode(), "Server response code was not 200 OK");
-        Assertions.assertNotNull(loginTwo.authToken, "Login result did not contain an authToken");
-
-        Assertions.assertNotEquals(existingAuth, loginOne.authToken,
-                "Authtoken returned by login matched authtoken from prior register");
-        Assertions.assertNotEquals(existingAuth, loginTwo.authToken,
-                "Authtoken returned by login matched authtoken from prior register");
-        Assertions.assertNotEquals(loginOne.authToken, loginTwo.authToken,
-                "Authtoken returned by login matched authtoken from prior login");
+        LoginResult loginResult = new LoginService().login(loginRequest, userDAO, authDAO);
+        after = authDAO.listSize();
+        Assertions.assertEquals(before, after, "Logged in with incorrect username/password relation");
     }
 
 
     @Test
     @Order(5)
-    @DisplayName("Normal User Registration")
-    public void successRegister() {
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = newUser.username;
-        registerRequest.password = newUser.password;
-        registerRequest.email = newUser.email;
+    @DisplayName("Normal Logout")
+    public void successLogout() {
+        //log out existing user
+        LogoutRequest logoutRequest = new LogoutRequest();
+        logoutRequest.setAuthToken(existingAuth);
+
+        LogoutResult logoutResult = new LogoutService().logout(logoutRequest,authDAO);
+
+        Assertions.assertNull(logoutResult.getMessage(), "Response didn't return successful");
+    }
 
 
+    @Test
+    @Order(6)
+    @DisplayName("Invalid AuthToken Logout")
+    public void failLogout() {
+        // log out using a wrong authToken
+        LogoutRequest logoutRequest = new LogoutRequest();
+        logoutRequest.setAuthToken("5656844");
 
-        //submit register request
-        TestModels.TestLoginRegisterResult registerResult = serverFacade.register(registerRequest);
+        LogoutResult logoutResult = new LogoutService().logout(logoutRequest,authDAO);
 
-        Assertions.assertTrue(registerResult.success,
-                "The return response is not success or 200.");
+        Assertions.assertNotNull(logoutResult.getMessage(), "Got a successful response for bad authToken");
     }
 
 
     @Test
     @Order(7)
-    @DisplayName("Register Bad Request")
-    public void failRegister() {
-        //attempt to register a user without a username
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = "";
-        registerRequest.password = newUser.password;
-        registerRequest.email = newUser.email;
+    @DisplayName("Valid Creation")
+    public void goodCreate() {
+        CreateRequest createRequest = new CreateRequest();
+        createRequest.setAuthToken(existingAuth);
+        createRequest.setGameName("Game1");
+        CreateResult createResult = new CreateService().createGame(createRequest,userDAO,authDAO,gameDAO);
 
-        TestModels.TestLoginRegisterResult registerResult = serverFacade.register(registerRequest);
-
-        Assertions.assertNull(registerResult.username, "Response incorrectly contained username");
+        Assertions.assertNotNull(createResult.getGameID(), "Result did not return a game ID");
     }
 
 
     @Test
     @Order(8)
-    @DisplayName("Normal Logout")
-    public void successLogout() {
-        //log out existing user
-        TestModels.TestResult result = serverFacade.logout(existingAuth);
+    @DisplayName("Create with Bad Authentication")
+    public void badAuthCreate() {
+        CreateRequest createRequest = new CreateRequest();
+        createRequest.setAuthToken("doesn't work");
+        createRequest.setGameName("BadGame");
+        CreateResult createResult = new CreateService().createGame(createRequest, userDAO, authDAO, gameDAO);
 
-        Assertions.assertTrue(result.success, "Response didn't return successful");
+        Assertions.assertNull(createResult.getGameID(), "Result returned a gameID when it shouldn't have");
+
     }
-
 
     @Test
     @Order(9)
-    @DisplayName("Invalid Auth Logout")
-    public void failLogout() {
-        // log out using a wrong authToken
-        TestModels.TestResult result = serverFacade.logout("55");
+    @DisplayName("Join Created Game")
+    public void goodJoin() throws DataAccessException {
 
-        // Checks for the word "error" in the message
-        Assertions.assertTrue(result.message.toLowerCase(Locale.ROOT).contains("error"),
-                "Response did not return error message");
+        //join as white
+        JoinRequest joinRequest = new JoinRequest();
+        joinRequest.setAuthToken(existingAuth);
+        joinRequest.setGameID(gameID);
+        joinRequest.setPlayerColor("WHITE");
+        JoinResult joinWhite = new JoinService().join(joinRequest, userDAO, authDAO, gameDAO);
+
+        joinRequest.setPlayerColor(null);
+        //try join to observe
+        JoinResult joinResult = new JoinService().join(joinRequest, userDAO, authDAO, gameDAO);
+
+        //check
+        Assertions.assertFalse(
+                joinResult.getMessage() != null && joinResult.getMessage().toLowerCase(Locale.ROOT).contains("error"),
+                "Result returned an error message");
     }
 
 
     @Test
     @Order(10)
-    @DisplayName("Valid Creation")
-    public void goodCreate() {
+    @DisplayName("Join Bad Game ID")
+    public void badGameIDJoin() throws DataAccessException {
+        //join as white
+        JoinRequest joinRequest = new JoinRequest();
+        joinRequest.setAuthToken(existingAuth);
+        joinRequest.setGameID(21112);
+        joinRequest.setPlayerColor("WHITE");
+        JoinResult joinWhite = new JoinService().join(joinRequest, userDAO, authDAO, gameDAO);
 
-        TestModels.TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
+        joinRequest.setPlayerColor(null);
+        //try join to observe
+        JoinResult joinResult = new JoinService().join(joinRequest, userDAO, authDAO, gameDAO);
 
-        Assertions.assertNotNull(createResult.gameID, "Result did not return a game ID");
+        //check
+        Assertions.assertTrue(
+                joinResult.getMessage() != null && joinResult.getMessage().toLowerCase(Locale.ROOT).contains("error"),
+                "Result returned an error message");
     }
 
 
     @Test
     @Order(11)
-    @DisplayName("Create with Bad Authentication")
-    public void badAuthCreate() {
-        //log out user so auth is invalid
-        serverFacade.logout(existingAuth);
-
-        TestModels.TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
-
-        Assertions.assertTrue(createResult.message.toLowerCase(Locale.ROOT).contains("error"),
-                "Bad result did not return an error message");
-    }
-
-
-    @Test
-    @Order(16)
-    @DisplayName("Join Created Game")
-    public void goodJoin() {
-        //create game
-        TestModels.TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
-
-        //join as white
-        TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
-        joinRequest.gameID = createResult.gameID;
-        joinRequest.playerColor = ChessGame.TeamColor.WHITE;
-
-        //try join
-        TestModels.TestResult joinResult = serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
-
-        //check
-        Assertions.assertFalse(
-                joinResult.message != null && joinResult.message.toLowerCase(Locale.ROOT).contains("error"),
-                "Result returned an error message");
-    }
-
-
-    @Test
-    @Order(19)
-    @DisplayName("Join Bad Game ID")
-    public void badGameIDJoin() {
-        //create game
-        createRequest = new TestModels.TestCreateRequest();
-        //join as white
-        TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
-        joinRequest.gameID = 0;
-        joinRequest.playerColor = ChessGame.TeamColor.WHITE;
-
-        //try join
-        TestModels.TestResult joinResult = serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
-
-        //check
-        Assertions.assertFalse(joinResult.success, "The request was not correct or successful");
-    }
-
-
-    @Test
-    @Order(20)
-    @DisplayName("List No Games")
+    @DisplayName("Success List Games")
     public void noGamesList() {
-        TestModels.TestListResult result = serverFacade.listGames(existingAuth);
+        GameListRequest gameListRequest = new GameListRequest();
+        gameListRequest.setAuthToken(existingAuth);
 
-        Assertions.assertFalse(result.message != null && result.message.toLowerCase(Locale.ROOT).contains("error"),
-                "Result returned an error message");
+        GameListResult gameListResult = new GameListService().gameList(gameListRequest,authDAO, gameDAO);
+
+        Assertions.assertFalse(gameListResult.getMessage() != null && gameListResult.getMessage().toLowerCase(Locale.ROOT).contains("error"),
+                "Did not return game list correctly");
     }
 
 
     @Test
-    @Order(21)
-    @DisplayName("List Multiple Games")
+    @Order(12)
+    @DisplayName("List Games with Bad AuthToken")
     public void gamesList() {
-        //register a few users to create games
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = "a";
-        registerRequest.password = "A";
-        registerRequest.email = "a.A";
-        TestModels.TestLoginRegisterResult userA = serverFacade.register(registerRequest);
+        GameListRequest gameListRequest = new GameListRequest();
+        gameListRequest.setAuthToken("this is not right");
 
-        registerRequest.username = "b";
-        registerRequest.password = "B";
-        registerRequest.email = "b.B";
-        TestModels.TestLoginRegisterResult userB = serverFacade.register(registerRequest);
+        GameListResult gameListResult = new GameListService().gameList(gameListRequest,authDAO, gameDAO);
 
-        //create games
-
-        //1 as black from A
-        createRequest.gameName = "game1";
-        TestModels.TestCreateResult game1 = serverFacade.createGame(createRequest, userA.authToken);
-
-        //1 as white from B
-        createRequest.gameName = "game2";
-        TestModels.TestCreateResult game2 = serverFacade.createGame(createRequest, userB.authToken);
-
-        //A join game 1 as black
-        TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
-        joinRequest.playerColor = ChessGame.TeamColor.BLACK;
-        joinRequest.gameID = game1.gameID;
-        serverFacade.verifyJoinPlayer(joinRequest, userA.authToken);
-
-        //B join game 2 as white
-        joinRequest.playerColor = ChessGame.TeamColor.WHITE;
-        joinRequest.gameID = game2.gameID;
-        serverFacade.verifyJoinPlayer(joinRequest, userB.authToken);
-
-        //create expected entry items
-        Collection<TestModels.TestListResult.TestListEntry> expectedList = new HashSet<>();
-
-        //game 1
-        TestModels.TestListResult.TestListEntry entry = new TestModels.TestListResult.TestListEntry();
-        entry.gameID = game1.gameID;
-        entry.gameName = "game1";
-        entry.blackUsername = userA.username;
-        entry.whiteUsername = null;
-        expectedList.add(entry);
-
-        //game 2
-        entry = new TestModels.TestListResult.TestListEntry();
-        entry.gameID = game2.gameID;
-        entry.gameName = "game2";
-        entry.blackUsername = null;
-        entry.whiteUsername = userB.username;
-        expectedList.add(entry);
-
-        TestModels.TestListResult listResult = serverFacade.listGames(existingAuth);
-        //check
-
-
-        Assertions.assertEquals(2, listResult.games.length);
+        Assertions.assertTrue(gameListResult.getMessage() != null && gameListResult.getMessage().toLowerCase(Locale.ROOT).contains("error"),
+                "Did not return game list correctly");
     }
 
 
     @Test
-    @Order(22)
+    @Order(13)
     @DisplayName("Clear Test")
-    public void clearData() {
+    public void clearData() throws DataAccessException {
         //create filler games
-        createRequest.gameName = "Game1";
-        serverFacade.createGame(createRequest, existingAuth);
-
-        createRequest.gameName = "game2";
-        serverFacade.createGame(createRequest, existingAuth);
+        CreateRequest createRequest = new CreateRequest();
+        createRequest.setAuthToken(existingAuth);
+        createRequest.setGameName("Game1");
+        CreateResult createResult = new CreateService().createGame(createRequest,userDAO,authDAO,gameDAO);
+        createRequest.setGameName("Game1");
+        CreateResult createResult2 = new CreateService().createGame(createRequest,userDAO,authDAO,gameDAO);
 
         //log in new user
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = "Emma";
-        registerRequest.password = "Sue";
-        registerRequest.email = "water@apple.com";
-        TestModels.TestLoginRegisterResult registerResult = serverFacade.register(registerRequest);
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("Jimmy");
+        registerRequest.setPassword("paster");
+        registerRequest.setEmail(email);
+        RegisterResult registerResult = new RegisterService().register(registerRequest,userDAO,authDAO);
+        // clear all
+        ClearRequest clearRequest = new ClearRequest();
+        ClearResult clearResult = new ClearService().clear(clearRequest, userDAO, authDAO, gameDAO);
 
-        //create and join game for new user
-        createRequest.gameName = "Tanner";
-        TestModels.TestCreateResult createResult = serverFacade.createGame(createRequest, registerResult.authToken);
-
-        TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
-        joinRequest.gameID = createResult.gameID;
-        joinRequest.playerColor = ChessGame.TeamColor.WHITE;
-        serverFacade.verifyJoinPlayer(joinRequest, registerResult.authToken);
-
-        //do clear
-        TestModels.TestResult clearResult = serverFacade.clear();
 
         //test clear successful
         Assertions.assertFalse(
-                clearResult.message != null && clearResult.message.toLowerCase(Locale.ROOT).contains("error"),
+                clearResult.getMessage() != null && clearResult.getMessage().toLowerCase(Locale.ROOT).contains("error"),
                 "Clear Result returned an error message");
 
     }
+
 
 
 }

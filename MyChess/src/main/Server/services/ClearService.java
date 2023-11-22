@@ -8,7 +8,7 @@ import Server.Results.ClearResult;
 import dataAccess.DataAccessException;
 
 public class ClearService {
-    public ClearResult clear(ClearRequest request, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) throws DataAccessException {
+    public ClearResult clear(ClearRequest request, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         ClearResult clearResult = new ClearResult();
         // No authToken needed for this part
         userDAO.clearAll();

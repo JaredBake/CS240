@@ -51,4 +51,11 @@ public class JoinRequest {
     public String getAuthToken() {
         return authToken;
     }
+    public void setGameID(Integer gameID){
+        this.gameID = gameID;
+    }
+
+    public void setPlayerColor(String playerColor) {
+        this.playerColor = playerColor;
+    }
 }

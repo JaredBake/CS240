@@ -25,7 +25,6 @@ public class LoginService {
             user = userDAO.find(request.getUsername(), request.getPassword());
         }catch (DataAccessException wrong_info){
             loginResult.setMessage(wrong_info.getMessage());
-
             return loginResult;
         }
         // Create and set the variables for registerResult

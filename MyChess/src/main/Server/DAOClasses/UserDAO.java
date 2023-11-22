@@ -58,7 +58,7 @@ public class UserDAO {
     /**
      * Clears all users from the database
      */
-    public void clearAll() throws DataAccessException{
+    public void clearAll() {
         users_map.clear();
     }
 

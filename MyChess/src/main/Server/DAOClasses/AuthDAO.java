@@ -25,6 +25,10 @@ public class AuthDAO {
         return authToken.getAuthToken();
     }
 
+    public Integer listSize(){
+        return auth_map.keySet().size();
+    }
+
     /**
      * Clears all authTokens from the database
      */
