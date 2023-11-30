@@ -4,9 +4,14 @@ import Server.Model.Game;
 import Server.Model.User;
 import dataAccess.DataAccessException;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+
+import static java.sql.DriverManager.getConnection;
 
 public class UserDAO {
 
@@ -65,6 +70,39 @@ public class UserDAO {
     public void checkRegister(String username) throws DataAccessException{
         if (users_map.containsKey(username)){
             throw new DataAccessException("Error: already taken");
+        }
+    }
+
+    void configureDatabase() throws SQLException {
+        try (Connection conn = getConnection()) {
+            var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS userDAO");
+            createDbStatement.executeUpdate();
+
+            conn.setCatalog("userDAO");
+
+            var createUserTable = """
+            CREATE TABLE  IF NOT EXISTS user (
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username)
+            )""";
+
+
+            try (var createTableStatement = conn.prepareStatement(createUserTable)) {
+                createTableStatement.executeUpdate();
+            }
+        }
+    }
+
+
+    Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "monkeypie");
+    }
+
+    void makeSQLCalls() throws SQLException {
+        try (var conn = getConnection()) {
+            // Execute SQL statements on the connection here
         }
     }
 }

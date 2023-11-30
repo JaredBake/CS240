@@ -6,6 +6,9 @@ import Server.Requests.JoinRequest;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -110,6 +113,39 @@ public class GameDAO {
             }
         }else{
             throw new DataAccessException("Error: bad request");
+        }
+    }
+
+    void configureDatabase() throws SQLException {
+        try (Connection conn = getConnection()) {
+            var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS gameDAO");
+            createDbStatement.executeUpdate();
+
+            conn.setCatalog("userDAO");
+
+            var createGameTable = """
+            CREATE TABLE  IF NOT EXISTS user (
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username)
+            )""";
+
+
+            try (var createTableStatement = conn.prepareStatement(createGameTable)) {
+                createTableStatement.executeUpdate();
+            }
+        }
+    }
+
+
+    Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "114766Jb");
+    }
+
+    void makeSQLCalls() throws SQLException {
+        try (var conn = getConnection()) {
+            // Execute SQL statements on the connection here
         }
     }
 }
