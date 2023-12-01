@@ -6,10 +6,12 @@ import Server.Requests.RegisterRequest;
 import Server.Results.RegisterResult;
 import Server.services.RegisterService;
 import com.google.gson.Gson;
+import dataAccess.Database;
 import spark.Request;
 import spark.Response;
 
 public class RegisterHandler extends Handler {
+
     public UserDAO userDAO;
     public AuthDAO authDAO;
     public RegisterHandler(UserDAO userDAO, AuthDAO authDAO) {

@@ -6,6 +6,7 @@ import Server.DAOClasses.UserDAO;
 import Server.Requests.ClearRequest;
 import Server.Results.ClearResult;
 import dataAccess.DataAccessException;
+import dataAccess.Database;
 
 public class ClearService {
     public ClearResult clear(ClearRequest request, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
@@ -17,3 +18,4 @@ public class ClearService {
         return clearResult;
     }
 }
+

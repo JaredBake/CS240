@@ -10,6 +10,7 @@ import Server.Results.RegisterResult;
 import Server.services.ClearService;
 import Server.services.RegisterService;
 import com.google.gson.Gson;
+import dataAccess.Database;
 import spark.Request;
 import spark.Response;
 
@@ -22,6 +23,7 @@ public class ClearHandler extends Handler{
         this.gameDAO = gameDAO;
         this.userDAO = userDAO;
     }
+
 
     @Override
     public Object handle(Request request, Response response) throws Exception {

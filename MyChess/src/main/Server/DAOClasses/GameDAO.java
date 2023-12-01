@@ -5,6 +5,7 @@ import Server.Model.User;
 import Server.Requests.JoinRequest;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
+import dataAccess.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GameDAO {
+
+    private Database database = new Database();
     private Map<Integer, Game> game_map = new HashMap<>();
 
     /**
@@ -117,35 +120,34 @@ public class GameDAO {
     }
 
     void configureDatabase() throws SQLException {
-        try (Connection conn = getConnection()) {
-            var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS gameDAO");
+        try (Connection conn = database.getConnection()) {
+            var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS mydatabase");
             createDbStatement.executeUpdate();
 
-            conn.setCatalog("userDAO");
+//            conn.setCatalog("mydatabase");
 
             var createGameTable = """
-            CREATE TABLE  IF NOT EXISTS user (
-                username VARCHAR(255) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL,
-                PRIMARY KEY (username)
+            CREATE TABLE  IF NOT EXISTS games (
+                whiteplayer VARCHAR(255) NULL,
+                blackplayer VARCHAR(255) NULL,
+                gamename VARCHAR(255) NOT NULL,
+                gameID VARCHAR(255) NOT NULL,
+                PRIMARY KEY (gameID)
             )""";
 
 
             try (var createTableStatement = conn.prepareStatement(createGameTable)) {
                 createTableStatement.executeUpdate();
             }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
-    Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "114766Jb");
-    }
-
-    void makeSQLCalls() throws SQLException {
-        try (var conn = getConnection()) {
-            // Execute SQL statements on the connection here
-        }
-    }
+//    void makeSQLCalls() throws SQLException {
+//        try (var conn = getConnection()) {
+//            // Execute SQL statements on the connection here
+//        }
+//    }
 }

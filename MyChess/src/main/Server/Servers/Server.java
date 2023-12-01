@@ -8,6 +8,7 @@ import Server.Model.User;
 import Server.Results.LoginResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dataAccess.Database;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -35,6 +36,10 @@ public class Server implements Route {
         UserDAO userDAO = new UserDAO();
         AuthDAO authDAO = new AuthDAO();
         GameDAO gameDAO = new GameDAO();
+
+        // Initialize the Database
+        Database database = new Database();
+
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));

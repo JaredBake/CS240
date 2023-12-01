@@ -2,6 +2,7 @@ package Server.DAOClasses;
 
 import Server.Model.AuthToken;
 import dataAccess.DataAccessException;
+import dataAccess.Database;
 
 import javax.xml.crypto.Data;
 import java.sql.Connection;
@@ -19,7 +20,7 @@ public class AuthDAO {
 
     // Map that contains the information about the auth tokens
     Map<String, AuthToken> auth_map = new HashMap<>();
-
+    private Database database = new Database();
     public String createToken(String username){
         AuthToken authToken = new AuthToken();
         authToken.setAuthToken(UUID.randomUUID().toString());
@@ -61,37 +62,26 @@ public class AuthDAO {
        throw new DataAccessException("Error: unauthorized");
     }
 
-    // TODO: Update the table maker
     void configureDatabase() throws SQLException {
-        try (Connection conn = getConnection()) {
-            var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS userDAO");
+        try (Connection conn = database.getConnection()) {
+            var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS mydatabase");
             createDbStatement.executeUpdate();
 
-            conn.setCatalog("userDAO");
+//            conn.setCatalog("mydatabase");
 
-            var createUserTable = """
-            CREATE TABLE  IF NOT EXISTS user (
+            var createAuthTable = """
+            CREATE TABLE  IF NOT EXISTS auth (
+                authtoken VARCHAR(255) NOT NULL,
                 username VARCHAR(255) NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL,
                 PRIMARY KEY (username)
             )""";
 
 
-            try (var createTableStatement = conn.prepareStatement(createUserTable)) {
+            try (var createTableStatement = conn.prepareStatement(createAuthTable)) {
                 createTableStatement.executeUpdate();
             }
-        }
-    }
-
-
-    Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "monkeypie");
-    }
-
-    void makeSQLCalls() throws SQLException {
-        try (var conn = getConnection()) {
-            // Execute SQL statements on the connection here
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

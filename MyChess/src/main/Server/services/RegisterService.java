@@ -7,6 +7,8 @@ import Server.Requests.RegisterRequest;
 import Server.Results.RegisterResult;
 import dataAccess.DataAccessException;
 
+import java.sql.SQLException;
+
 public class RegisterService {
     public RegisterResult register(RegisterRequest request, UserDAO userDAO, AuthDAO authDAO) throws DataAccessException {
         RegisterResult registerResult = new RegisterResult();
@@ -29,7 +31,11 @@ public class RegisterService {
         }
         User user = new User(request.getPassword(),request.getUsername(),request.getEmail());
             // Create and set the variables for registerResult
-        userDAO.createUser(user);
+        try {
+            userDAO.createUser(user);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         registerResult.setAuthToken(authDAO.createToken(user.getUsername()));
         registerResult.setUsername(user.getUsername());
         return registerResult;
