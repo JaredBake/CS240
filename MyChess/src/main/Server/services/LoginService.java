@@ -8,6 +8,7 @@ import Server.Results.LoginResult;
 import dataAccess.DataAccessException;
 
 import javax.xml.crypto.Data;
+import java.sql.SQLException;
 
 /**
  * Class to get use in information given to login.
@@ -28,7 +29,11 @@ public class LoginService {
             return loginResult;
         }
         // Create and set the variables for registerResult
-        loginResult.setAuthToken(authDAO.createToken(user.getUsername()));
+        try {
+            loginResult.setAuthToken(authDAO.createToken(user.getUsername()));
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
+        }
         loginResult.setUsername(user.getUsername());
         return loginResult;
     }

@@ -36,7 +36,11 @@ public class RegisterService {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        registerResult.setAuthToken(authDAO.createToken(user.getUsername()));
+        try {
+            registerResult.setAuthToken(authDAO.createToken(user.getUsername()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         registerResult.setUsername(user.getUsername());
         return registerResult;
     }

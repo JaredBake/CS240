@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 /**
  *  A database for storing and retrieving the server’s data for authTokens
  */
@@ -21,10 +23,29 @@ public class AuthDAO {
     // Map that contains the information about the auth tokens
     Map<String, AuthToken> auth_map = new HashMap<>();
     private Database database = new Database();
-    public String createToken(String username){
+    public String createToken(String username) throws SQLException {
+
+        Connection conn;
         AuthToken authToken = new AuthToken();
         authToken.setAuthToken(UUID.randomUUID().toString());
         authToken.setUsername(username);
+        // Get the connection with mydatabase
+        try {
+            conn = database.getConnection();
+        } catch (DataAccessException exception) {
+            throw new RuntimeException(exception);
+        }
+        if (username.matches("[a-zA-Z]+")) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO auth (username, auth) VALUES(?, ?)", RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, String.valueOf(authToken));
+
+                preparedStatement.executeUpdate();
+            }catch (SQLException exception){
+                throw new SQLException("Could not create a new authToken");
+            }
+        }
+
         auth_map.put(authToken.getAuthToken(),authToken);
         return authToken.getAuthToken();
     }

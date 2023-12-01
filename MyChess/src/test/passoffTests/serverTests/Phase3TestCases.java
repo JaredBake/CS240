@@ -12,6 +12,7 @@ import chess.ChessGame;
 import dataAccess.DataAccessException;
 import org.junit.jupiter.api.*;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,7 +34,11 @@ public class Phase3TestCases {
         ClearRequest clearRequest = new ClearRequest();
         ClearService clearService = new ClearService();
         clearService.clear(clearRequest, userDAO, authDAO, gameDAO);
-        existingAuth = authDAO.createToken(username);
+        try {
+            existingAuth = authDAO.createToken(username);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         // Create a test User
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setUsername(username);

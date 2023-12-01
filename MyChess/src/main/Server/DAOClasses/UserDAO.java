@@ -38,33 +38,25 @@ public class UserDAO {
 //        users_map.put(user.getUsername(),user);
 //        //throw new DataAccessException("Error: description");
 //    }
-public int createUser(User user) throws SQLException {
-        String username = user.getUsername();
-        String password = user.getPassword();
-        Connection conn = null;
+public void createUser(User user) throws SQLException {
+
+        Connection conn;
         try {
             conn = database.getConnection();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        } catch (DataAccessException exception) {
+            throw new RuntimeException(exception);
         }
-        if (username.matches("[a-zA-Z]+")) {
-            var statement = "INSERT INTO pet (name) VALUES(?)";
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO username (name, password) VALUES(?, ?)", RETURN_GENERATED_KEYS)) {
-                preparedStatement.setString(1, username);
-                preparedStatement.setString(2, password);
+        if (user.getUsername().matches("[a-zA-Z]+")) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES(?, ?, ?)", RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, user.getPassword());
+                preparedStatement.setString(3, user.getEmail());
 
                 preparedStatement.executeUpdate();
-
-                var resultSet = preparedStatement.getGeneratedKeys();
-                var ID = 0;
-                if (resultSet.next()) {
-                    ID = resultSet.getInt(1);
-                }
-
-                return ID;
+            }catch (SQLException exception){
+                throw new SQLException("Did not insert into database");
             }
         }
-        throw new SQLException("Gave a bad username");
     }
     /**
      * Tries to find the desired user from the database by username
@@ -99,8 +91,6 @@ public int createUser(User user) throws SQLException {
     }
 
     public void checkRegister(String username) throws DataAccessException{
-
-
         if (users_map.containsKey(username)){
             throw new DataAccessException("Error: already taken");
         }
