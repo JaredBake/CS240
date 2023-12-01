@@ -54,8 +54,15 @@ public void createUser(User user) throws SQLException {
 
                 preparedStatement.executeUpdate();
             }catch (SQLException exception){
-                throw new SQLException("Did not insert into database");
+                throw new SQLException("Error: already taken");
             }
+        }
+}
+
+    void deleteUser(Connection conn, String username) throws SQLException {
+        try (var preparedStatement = conn.prepareStatement("DELETE FROM user WHERE username=?")) {
+            preparedStatement.setString(1, username);
+            preparedStatement.executeUpdate();
         }
     }
     /**
@@ -86,8 +93,19 @@ public void createUser(User user) throws SQLException {
     /**
      * Clears all users from the database
      */
-    public void clearAll() {
-        users_map.clear();
+    public void clearAll() throws SQLException{
+        Connection conn = null;
+        try {
+            conn = database.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (var preparedStatement = conn.prepareStatement("TRUNCATE user")) {
+            preparedStatement.executeUpdate();
+        }catch (SQLException exception){
+            throw new SQLException("Error: unexpected error");
+        }
     }
 
     public void checkRegister(String username) throws DataAccessException{
@@ -95,8 +113,8 @@ public void createUser(User user) throws SQLException {
             throw new DataAccessException("Error: already taken");
         }
     }
-// TODO: do this first
-    void configureDatabase() throws SQLException {
+
+    public void configureDatabase() throws SQLException {
         try (Connection conn = database.getConnection()) {
             var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS mydatabase");
             createDbStatement.executeUpdate();
@@ -119,10 +137,4 @@ public void createUser(User user) throws SQLException {
             throw new RuntimeException(e);
         }
     }
-
-//    void makeSQLCalls() throws SQLException {
-//        try (var conn = getConnection()) {
-//            // Execute SQL statements on the connection here
-//        }
-//    }
 }

@@ -33,13 +33,15 @@ public class RegisterService {
             // Create and set the variables for registerResult
         try {
             userDAO.createUser(user);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException exception) {
+            registerResult.setMessage(exception.getMessage());
+            return registerResult;
         }
         try {
             registerResult.setAuthToken(authDAO.createToken(user.getUsername()));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException exception) {
+            registerResult.setMessage(exception.getMessage());
+            return registerResult;
         }
         registerResult.setUsername(user.getUsername());
         return registerResult;

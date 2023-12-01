@@ -8,11 +8,17 @@ import Server.Results.ClearResult;
 import dataAccess.DataAccessException;
 import dataAccess.Database;
 
+import java.sql.SQLException;
+
 public class ClearService {
     public ClearResult clear(ClearRequest request, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         ClearResult clearResult = new ClearResult();
         // No authToken needed for this part
-        userDAO.clearAll();
+        try {
+            userDAO.clearAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         authDAO.clearAll();
         gameDAO.clearAll();
         return clearResult;

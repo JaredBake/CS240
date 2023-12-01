@@ -20,8 +20,6 @@ public class Server implements Route {
     /**
      * Handler needs to interpret a Json into the pieces and then put it back together.
      */
-    private ArrayList<String> names = new ArrayList<>();
-
     public static void main(String[] args) {
         new Server().run();
     }
@@ -36,10 +34,6 @@ public class Server implements Route {
         UserDAO userDAO = new UserDAO();
         AuthDAO authDAO = new AuthDAO();
         GameDAO gameDAO = new GameDAO();
-
-        // Initialize the Database
-        Database database = new Database();
-
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));

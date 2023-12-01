@@ -35,15 +35,12 @@ public class AuthDAO {
         } catch (DataAccessException exception) {
             throw new RuntimeException(exception);
         }
-        if (username.matches("[a-zA-Z]+")) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO auth (username, auth) VALUES(?, ?)", RETURN_GENERATED_KEYS)) {
-                preparedStatement.setString(1, username);
-                preparedStatement.setString(2, String.valueOf(authToken));
-
-                preparedStatement.executeUpdate();
-            }catch (SQLException exception){
-                throw new SQLException("Could not create a new authToken");
-            }
+        try (var preparedStatement = conn.prepareStatement("INSERT INTO auth (username, authtoken) VALUES(?, ?)", RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, String.valueOf(authToken));
+            preparedStatement.executeUpdate();
+        }catch (SQLException exception){
+            throw new SQLException("Could not create a new authToken");
         }
 
         auth_map.put(authToken.getAuthToken(),authToken);
@@ -62,25 +59,50 @@ public class AuthDAO {
     }
 
     public boolean verifyToken(String token) throws DataAccessException {
-        if (auth_map.containsKey(token)){
-            return true;
-        }else{
-            throw new DataAccessException("Error: unauthorized");
-        }
-    }
 
-    public AuthToken getAuthToken(String token){
-        return auth_map.get(token);
+        Connection conn = database.getConnection();
+        String authtoken = "";
+        try (var preparedStatement = conn.prepareStatement("SELECT authtoken FROM auth ")) {
+            preparedStatement.setString(1, token);
+            try (var rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    authtoken = rs.getString("authtoken");
+
+                    System.out.printf("authToken: %s", authtoken);
+                }
+            }
+        } catch (SQLException exception) {
+            try {
+                throw new SQLException("Error: unathorized");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return true;
+//            throw new DataAccessException("Error: unauthorized");
+
     }
-    public void deleteToken(String authToken) {
-        auth_map.remove(authToken);
+    public void deleteToken(String token) {
+        auth_map.remove(token);
     }
 
     public String findUser(String authToken) throws DataAccessException{
-       if (auth_map.containsKey(authToken)){
-           return auth_map.get(authToken).getUsername();
-       }
-       throw new DataAccessException("Error: unauthorized");
+        Connection conn = database.getConnection();
+        String username = "";
+        try (var preparedStatement = conn.prepareStatement("SELECT username FROM auth WHERE authtoken=?")) {
+            preparedStatement.setString(1, authToken);
+            try (var rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    username = rs.getString("username");
+
+                    System.out.printf("authToken: %s", username);
+                }
+            }
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
+        }
+        return username;
+//        throw new DataAccessException("Error: unauthorized");
     }
 
     void configureDatabase() throws SQLException {
