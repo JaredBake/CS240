@@ -10,7 +10,10 @@ import dataAccess.DataAccessException;
 import java.sql.SQLException;
 
 public class RegisterService {
-    public RegisterResult register(RegisterRequest request, UserDAO userDAO, AuthDAO authDAO) throws DataAccessException {
+
+    private UserDAO userDAO = new UserDAO();
+    private AuthDAO authDAO = new AuthDAO();
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
         RegisterResult registerResult = new RegisterResult();
         // Checks to make sure the password and username are present
         try {
@@ -22,13 +25,7 @@ public class RegisterService {
             registerResult.setMessage(requestError.getMessage());
             return registerResult;
         }
-        // If username is already used set error message
-        try {
-            userDAO.checkRegister(request.getUsername());
-        }catch (DataAccessException wrong_username){
-            registerResult.setMessage(wrong_username.getMessage());
-            return registerResult;
-        }
+
         User user = new User(request.getPassword(),request.getUsername(),request.getEmail());
             // Create and set the variables for registerResult
         try {

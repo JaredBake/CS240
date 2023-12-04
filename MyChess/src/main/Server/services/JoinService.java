@@ -10,7 +10,10 @@ import dataAccess.DataAccessException;
 import javax.xml.crypto.Data;
 
 public class JoinService {
-    public JoinResult join(JoinRequest joinRequest, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) throws DataAccessException {
+    public JoinResult join(JoinRequest joinRequest) throws DataAccessException {
+        UserDAO userDAO = new UserDAO();
+        AuthDAO authDAO = new AuthDAO();
+        GameDAO gameDAO = new GameDAO();
         JoinResult joinResult = new JoinResult();
         // Verify Token
         try {

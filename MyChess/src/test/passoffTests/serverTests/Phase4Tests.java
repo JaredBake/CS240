@@ -5,96 +5,113 @@ import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
 import Server.Handlers.CreateHandler;
 import Server.Model.Game;
+import Server.Model.User;
 import Server.Requests.*;
 import Server.Results.*;
 import Server.services.*;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
+import dataAccess.Database;
 import org.junit.jupiter.api.*;
 import passoffTests.obfuscatedTestClasses.TestServerFacade;
 import passoffTests.testClasses.TestModels;
 
+import javax.xml.crypto.Data;
+import java.awt.image.RGBImageFilter;
+import java.sql.Connection;
 import java.util.*;
 
 public class Phase4Tests {
-    private static TestModels.TestUser existingUser;
-    private static TestModels.TestUser newUser;
-    private static TestServerFacade serverFacade;
     private String existingAuth;
+    private static Database database = new Database();
+
+    private static User user = new User("testPassword", "testPassword","urim@thummim.net");
+
+
 
     @BeforeAll
     public static void init() {
-        existingUser = new TestModels.TestUser();
-        existingUser.username = "Joseph";
-        existingUser.password = "Smith";
-        existingUser.email = "urim@thummim.net";
-
-        newUser = new TestModels.TestUser();
-        newUser.username = "testUsername";
-        newUser.password = "testPassword";
-        newUser.email = "testEmail";
-
-        serverFacade = new TestServerFacade("localhost", passoffTests.TestFactory.getServerPort());
+        ClearRequest clearRequest = new ClearRequest();
+        ClearResult clearResult = new ClearService().clear(clearRequest);
     }
 
 
     @BeforeEach
     public void setup() {
-        serverFacade.clear();
 
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = existingUser.username;
-        registerRequest.password = existingUser.password;
-        registerRequest.email = existingUser.email;
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername(user.getUsername());
+        registerRequest.setPassword(user.getPassword());
+        registerRequest.setEmail(user.getEmail());
 
         //one user already logged in
-        TestModels.TestLoginRegisterResult regResult = serverFacade.register(registerRequest);
-        existingAuth = regResult.authToken;
+        RegisterResult regResult = null;
+        try {
+            regResult = new RegisterService().register(registerRequest);
+        } catch (DataAccessException exception) {
+            throw new RuntimeException(exception);
+        }
+        existingAuth = regResult.getAuthToken();
     }
 
 
-    private TestModels.TestCreateRequest validCreateGameRequest() {
-        var result = new TestModels.TestCreateRequest();
-        result.gameName = "Test Game";
+    private CreateRequest validCreateGameRequest() {
+        var result = new CreateRequest();
+        result.setGameName("Test Game");
         return result;
     }
 
 
     @Test
-    @DisplayName("Persistence Test")
-    public void persistenceTest() {
+    @DisplayName("Phase4 Test")
+    public void persistenceTest() throws DataAccessException {
         //insert a bunch of data
         //-------------------------------------------------------------------------------------------------------------
         //register 2nd user
-        TestModels.TestRegisterRequest registerRequest = new TestModels.TestRegisterRequest();
-        registerRequest.username = newUser.username;
-        registerRequest.password = newUser.password;
-        registerRequest.email = newUser.email;
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setUsername("Emma");
+        registerRequest.setPassword(user.getPassword());
+        registerRequest.setEmail(user.getEmail());
 
-        TestModels.TestLoginRegisterResult regResult = serverFacade.register(registerRequest);
-        String newAuth = regResult.authToken;
+        RegisterResult registerResult = new RegisterService().register(registerRequest);
+        if (registerResult.getMessage() != null){
+            throw new DataAccessException("Error: bad registration");
+        }
+        String newAuth = registerResult.getAuthToken();
 
         //create 2 games
-        TestModels.TestCreateRequest createRequest = validCreateGameRequest();
+        CreateRequest createRequest = validCreateGameRequest();
 
         //first one has both players in it
-        createRequest.gameName = "test1";
-        TestModels.TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
+        createRequest.setGameName("test1");
+        createRequest.setAuthToken(existingAuth);
+        CreateResult createResult = new CreateService().createGame(createRequest);
 
         //have first user join
-        TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
-        joinRequest.gameID = createResult.gameID;
-        joinRequest.playerColor = ChessGame.TeamColor.WHITE;
-        serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
+        JoinRequest joinRequest = new JoinRequest();
+        joinRequest.setGameID(createResult.getGameID());
+        joinRequest.setPlayerColor("WHITE");
+        JoinResult joinResult = new JoinService().join(joinRequest);
+        if (joinResult.getMessage() != null){
+            throw new DataAccessException("Error: Could not join game");
+        }
+
 
         //have second user join
-        joinRequest.playerColor = ChessGame.TeamColor.BLACK;
-        serverFacade.verifyJoinPlayer(joinRequest, newAuth);
+        joinRequest.setPlayerColor("BLACK");
+        joinResult = new JoinService().join(joinRequest);
+        if (joinResult.getMessage() != null){
+            throw new DataAccessException("Error: Could not join game");
+        }
 
         //second empty game
-        createRequest.gameName = "test2";
-        TestModels.TestCreateResult createResult2 = serverFacade.createGame(createRequest, newAuth);
-        //-------------------------------------------------------------------------------------------------------------
+        createRequest.setGameName("test2");
+        CreateResult createResult2 = new CreateService().createGame(createRequest);
+
+        //get list of games
+        GameListRequest listRequest = new GameListRequest();
+        GameListResult listResult1 = new GameListService().gameList(listRequest);
+        //------------------------------------------------------------------------------------------------------------
 
 
         //Will wait on the statement scanner.nextLine() till you push enter in the terminal window.
@@ -108,39 +125,39 @@ public class Phase4Tests {
         //-------------------------------------------------------------------------------------------------------------
         //list games, see both user in game
         //also checks that first user still has auth in database
-        TestModels.TestListResult listResult = serverFacade.listGames(existingAuth);
+        listRequest = new GameListRequest();
+        GameListResult listResult2 = new GameListService().gameList(listRequest);
 
-        Assertions.assertTrue(listResult.success, "User auth not found in database after restart");
-        Assertions.assertEquals(2, listResult.games.length, "Missing game(s) in database after restart");
+        Assertions.assertEquals(listResult1.getGames(), listResult2.getGames(), "Missing game(s) in database after restart");
 
         //set games & check if swapped
-        TestModels.TestListResult.TestListEntry game1 = listResult.games[0];
-        TestModels.TestListResult.TestListEntry game2 = listResult.games[1];
-        if (Objects.equals(game1.gameID, createResult2.gameID)) { //swap games if needed
-            TestModels.TestListResult.TestListEntry tempGame = game1;
+        ArrayList<Game> game1 = listResult1.getGames();
+        ArrayList<Game> game2 = listResult2.getGames();
+        if (Objects.equals(game1.get(0).getGameID(), game2.get(1).getGameID())) { //swap games if needed
+            ArrayList<Game> tempGame = game1;
             game1 = game2;
             game2 = tempGame;
         }
 
 
         //check that both tests are there
-        Assertions.assertEquals("test1", game1.gameName, "Game name changed after restart");
-        Assertions.assertEquals(createResult.gameID, game1.gameID, "Game ID Changed after restart");
-        Assertions.assertEquals("test2", game2.gameName, "Game name changed after restart");
-        Assertions.assertEquals(createResult2.gameID, game2.gameID, "Game ID changed after restart");
+        Assertions.assertEquals("test1", game1.get(0).getGameName(), "Game name changed after restart");
+        Assertions.assertEquals(createResult.getGameID(), game1.get(0).getGameID(), "Game ID Changed after restart");
+        Assertions.assertEquals("test2", game2.get(1).getGameName(), "Game name changed after restart");
+        Assertions.assertEquals(createResult2.getGameID(), game2.get(1).getGameID(), "Game ID changed after restart");
 
         //check players in test1 game
-        Assertions.assertEquals(existingUser.username, game1.whiteUsername,
+        Assertions.assertEquals(user.getUsername(), game1.get(0).getWhiteUsername(),
                 "White player username changed after restart");
-        Assertions.assertEquals(newUser.username, game1.blackUsername, "Black player username changed after restart");
+        Assertions.assertEquals("Emma", game1.get(0).getBlackUsername(), "Black player username changed after restart");
 
         //make sure second user can log in
-        TestModels.TestLoginRequest loginRequest = new TestModels.TestLoginRequest();
-        loginRequest.username = newUser.username;
-        loginRequest.password = newUser.password;
-        TestModels.TestLoginRegisterResult loginResult = serverFacade.login(loginRequest);
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("Emma");
+        loginRequest.setPassword(user.getPassword());
+        LoginResult loginResult = new LoginService().login(loginRequest);
 
-        Assertions.assertTrue(loginResult.success, "Second user not able to log in after restart");
+        Assertions.assertNull(loginResult.getMessage(), "Second user not able to log in after restart");
         //-------------------------------------------------------------------------------------------------------------
     }
 

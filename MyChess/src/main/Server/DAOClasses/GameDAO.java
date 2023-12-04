@@ -57,6 +57,7 @@ public class GameDAO {
      * Finds all games that have been created
      */
     public Map<Integer,Game> findAll() throws DataAccessException{
+        // TODO: UPDATE
         if (!game_map.isEmpty()) {
             return game_map;
         }
@@ -83,10 +84,12 @@ public class GameDAO {
      * Clears all games from the database
      */
     public void clearAll() {
+        // TODO: UPDATE
         game_map.clear();
     }
 
     public ArrayList<Game> getGameList(){
+        // TODO: UPDATE
         ArrayList<Game> gameList = new ArrayList<>();
         for (Integer ID: game_map.keySet()){
             gameList.add(game_map.get(ID));
@@ -101,6 +104,7 @@ public class GameDAO {
      * Claims a spot in the game and saves the color of team
      */
     public void claimSpot(String username, Integer gameID, String playerColor) throws DataAccessException {
+        // TODO: UPDATE
         Game game = game_map.get(gameID);
         if (playerColor.equals("BLACK")){
             if (game.getBlackUsername() == null) {
@@ -120,21 +124,20 @@ public class GameDAO {
     }
 
     void configureDatabase() throws SQLException {
+        // TODO: UPDATE
         try (Connection conn = database.getConnection()) {
             var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS mydatabase");
             createDbStatement.executeUpdate();
 
-//            conn.setCatalog("mydatabase");
-
             var createGameTable = """
             CREATE TABLE  IF NOT EXISTS games (
-                whiteplayer VARCHAR(255) NULL,
-                blackplayer VARCHAR(255) NULL,
+                whiteplayer VARCHAR(255) DEFAULT NULL,
+                blackplayer VARCHAR(255) DEFAULT NULL,
                 gamename VARCHAR(255) NOT NULL,
                 gameID VARCHAR(255) NOT NULL,
+                chessGame TEXT NOT NULL,
                 PRIMARY KEY (gameID)
             )""";
-
 
             try (var createTableStatement = conn.prepareStatement(createGameTable)) {
                 createTableStatement.executeUpdate();
@@ -143,11 +146,4 @@ public class GameDAO {
             throw new RuntimeException(e);
         }
     }
-
-
-//    void makeSQLCalls() throws SQLException {
-//        try (var conn = getConnection()) {
-//            // Execute SQL statements on the connection here
-//        }
-//    }
 }

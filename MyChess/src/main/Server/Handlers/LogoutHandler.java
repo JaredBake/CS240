@@ -14,18 +14,14 @@ import spark.Request;
 import spark.Response;
 
 public class LogoutHandler extends Handler{
-
-    public AuthDAO authDAO;
-    public LogoutHandler(AuthDAO authDAO) {
-        this.authDAO = authDAO;
-
+    public LogoutHandler() {
     }
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
         LogoutRequest logoutRequest = new LogoutRequest();
         logoutRequest.setAuthToken(request.headers("Authorization"));
-        LogoutResult logoutResult = new LogoutService().logout(logoutRequest, authDAO);
+        LogoutResult logoutResult = new LogoutService().logout(logoutRequest);
         if (logoutResult.getMessage() == null){
             response.status(200);
         } else if (logoutResult.getMessage().equals("Error: unauthorized")) {

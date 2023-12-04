@@ -11,8 +11,10 @@ import dataAccess.DataAccessException;
 import javax.xml.crypto.Data;
 
 public class CreateService {
-    public CreateResult createGame(CreateRequest request, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
+    public CreateResult createGame(CreateRequest request) {
         CreateResult createResult = new CreateResult();
+        AuthDAO authDAO = new AuthDAO();
+        GameDAO gameDAO = new GameDAO();
         // Verify authToken
         try{
             authDAO.verifyToken(request.getAuthToken());

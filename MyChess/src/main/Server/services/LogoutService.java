@@ -9,7 +9,8 @@ import dataAccess.DataAccessException;
 
 public class LogoutService {
 
-    public LogoutResult logout(LogoutRequest request, AuthDAO authDAO) {
+    public LogoutResult logout(LogoutRequest request) {
+        AuthDAO authDAO = new AuthDAO();
         LogoutResult logoutResult = new LogoutResult();
         try {
             authDAO.verifyToken(request.getAuthToken());

@@ -2,14 +2,14 @@ package Server.services;
 
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
-import Server.Model.Game;
 import Server.Requests.GameListRequest;
-import Server.Results.CreateResult;
 import Server.Results.GameListResult;
 import dataAccess.DataAccessException;
 
 public class GameListService {
-    public GameListResult gameList(GameListRequest request, AuthDAO authDAO, GameDAO gameDAO) {
+    public GameListResult gameList(GameListRequest request) {
+        GameDAO gameDAO = new GameDAO();
+        AuthDAO authDAO = new AuthDAO();
         GameListResult gameListResult = new GameListResult();
         // Verify authToken
         try{

@@ -36,13 +36,13 @@ public class Server implements Route {
         GameDAO gameDAO = new GameDAO();
 
         // Register handlers for each endpoint using the method reference syntax
-        Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO));
-        Spark.post("/user", new RegisterHandler(userDAO, authDAO));
-        Spark.post("/session", new LoginHandler(userDAO, authDAO));
-        Spark.delete("/session", new LogoutHandler(authDAO));
-        Spark.get("/game", new GameListHandler(authDAO, gameDAO));
-        Spark.post("/game", new CreateHandler(userDAO, authDAO, gameDAO));
-        Spark.put("/game", new JoinHandler(userDAO, authDAO, gameDAO));
+        Spark.delete("/db", new ClearHandler());
+        Spark.post("/user", new RegisterHandler());
+        Spark.post("/session", new LoginHandler());
+        Spark.delete("/session", new LogoutHandler());
+        Spark.get("/game", new GameListHandler());
+        Spark.post("/game", new CreateHandler());
+        Spark.put("/game", new JoinHandler());
     }
 
 /*

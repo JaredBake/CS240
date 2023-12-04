@@ -2,6 +2,8 @@ package Server.Model;
 
 import chess.ChessGame;
 
+import javax.print.DocFlavor;
+
 /**
  * Gets information about
  */
@@ -71,5 +73,9 @@ public class Game {
 
     public void setGameID(Integer gameID) {
         this.gameID = gameID;
+    }
+
+    public Integer getGameID(){
+        return gameID;
     }
 }

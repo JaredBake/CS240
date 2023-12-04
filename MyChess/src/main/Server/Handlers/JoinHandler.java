@@ -15,20 +15,14 @@ import spark.Request;
 import spark.Response;
 
 public class JoinHandler extends Handler{
-    private UserDAO userDAO;
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
-    public JoinHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
-        this. userDAO = userDAO;
+    public JoinHandler() {
     }
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
         JoinRequest joinRequest = new Gson().fromJson(request.body(), JoinRequest.class);
         joinRequest.setAuthToken(request.headers("Authorization"));
-        JoinResult joinResult = new JoinService().join(joinRequest, userDAO, authDAO, gameDAO);
+        JoinResult joinResult = new JoinService().join(joinRequest);
         if (joinResult.getMessage() == null){
             response.status(200);
         } else if (joinResult.getMessage().equals("Error: bad request")) {

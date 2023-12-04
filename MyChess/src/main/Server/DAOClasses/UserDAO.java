@@ -21,25 +21,8 @@ public class UserDAO {
     private Map<String, User> users_map = new HashMap<>();
     private Database database = new Database();
 
-
-
-//    public void createUser(User user) throws DataAccessException {
-//        /**
-//         * Checks to see if the username is already being used and checks to make sure there
-//         * is a username and password before creating a new user and authToken
-//         */
-//        if (user.getUsername().isEmpty() || user.getPassword().isEmpty()
-//        || user.getPassword().isBlank() || user.getUsername().isBlank()){
-//            throw new DataAccessException("Error: bad request");
-//        }
-//        if (users_map.containsKey(user.getUsername())){
-//            throw new DataAccessException("Error: already taken");
-//        }
-//        users_map.put(user.getUsername(),user);
-//        //throw new DataAccessException("Error: description");
-//    }
 public void createUser(User user) throws SQLException {
-
+        // UPDATED
         Connection conn;
         try {
             conn = database.getConnection();
@@ -59,23 +42,45 @@ public void createUser(User user) throws SQLException {
         }
 }
 
-    void deleteUser(Connection conn, String username) throws SQLException {
-        try (var preparedStatement = conn.prepareStatement("DELETE FROM user WHERE username=?")) {
-            preparedStatement.setString(1, username);
-            preparedStatement.executeUpdate();
-        }
-    }
+//    void deleteUser(Connection conn, String username) throws SQLException {
+//    // TODO: UPDATE
+//        try (var preparedStatement = conn.prepareStatement("DELETE FROM user WHERE username=?")) {
+//            preparedStatement.setString(1, username);
+//            preparedStatement.executeUpdate();
+//        }
+//    }
     /**
      * Tries to find the desired user from the database by username
      */
     public User find(String username, String password) throws DataAccessException{
-        if (users_map.containsKey(username)){
-            if (!users_map.get(username).getPassword().equals(password)) {
-                throw new DataAccessException("Error: unauthorized");
-            }
-            return users_map.get(username);
+        // UPDATED
+        Connection conn;
+        User user = null;
+        try {
+            conn = database.getConnection();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
-        throw new DataAccessException("Error: unauthorized");
+        try (var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM user WHERE username=?")) {
+            preparedStatement.setString(1, username);
+            try (var rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    var name = rs.getString("username");
+                    var pass = rs.getString("password");
+                    var email = rs.getString("email");
+
+                    if (!pass.equals(password)){
+                        throw new DataAccessException("Error: wrong password");
+                    }
+
+                    user = new User(pass, name, email);
+                    System.out.printf("username: %s, password: %s, email: %s", name, pass, email);
+                }
+            }
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
+        }
+        return user;
     }
 
 
@@ -83,6 +88,7 @@ public void createUser(User user) throws SQLException {
      * Finds all users that have been created
      */
     public Integer findAll(){
+        // TODO: UPDATE LAST
         if (!users_map.keySet().isEmpty()){
             return users_map.keySet().size();
         }else {
@@ -94,6 +100,7 @@ public void createUser(User user) throws SQLException {
      * Clears all users from the database
      */
     public void clearAll() throws SQLException{
+        // UPDATED
         Connection conn = null;
         try {
             conn = database.getConnection();
@@ -108,13 +115,14 @@ public void createUser(User user) throws SQLException {
         }
     }
 
-    public void checkRegister(String username) throws DataAccessException{
-        if (users_map.containsKey(username)){
-            throw new DataAccessException("Error: already taken");
-        }
-    }
+//    public void checkRegister(String username) throws DataAccessException{
+//        if (users_map.containsKey(username)){
+//            throw new DataAccessException("Error: already taken");
+//        }
+//    }
 
     public void configureDatabase() throws SQLException {
+        // UPDATED
         try (Connection conn = database.getConnection()) {
             var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS mydatabase");
             createDbStatement.executeUpdate();

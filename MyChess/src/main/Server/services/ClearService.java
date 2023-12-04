@@ -5,19 +5,20 @@ import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
 import Server.Requests.ClearRequest;
 import Server.Results.ClearResult;
-import dataAccess.DataAccessException;
-import dataAccess.Database;
 
 import java.sql.SQLException;
 
 public class ClearService {
-    public ClearResult clear(ClearRequest request, UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
+    public ClearResult clear(ClearRequest request) {
+        UserDAO userDAO = new UserDAO();
+        AuthDAO authDAO = new AuthDAO();
+        GameDAO gameDAO = new GameDAO();
         ClearResult clearResult = new ClearResult();
         // No authToken needed for this part
         try {
             userDAO.clearAll();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
         authDAO.clearAll();
         gameDAO.clearAll();

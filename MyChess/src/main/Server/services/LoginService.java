@@ -17,7 +17,9 @@ public class LoginService {
     /**
      * function to access the login requests
      */
-    public LoginResult login(LoginRequest request, UserDAO userDAO, AuthDAO authDAO) throws DataAccessException {
+    public LoginResult login(LoginRequest request) throws DataAccessException {
+        UserDAO userDAO = new UserDAO();
+        AuthDAO authDAO = new AuthDAO();
         // Login the User
         User user = null;
         LoginResult loginResult = new LoginResult();

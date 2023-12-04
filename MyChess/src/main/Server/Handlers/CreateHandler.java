@@ -14,20 +14,14 @@ import spark.Request;
 import spark.Response;
 
 public class CreateHandler extends Handler{
-    private UserDAO userDAO;
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
-    public CreateHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
-        this.userDAO = userDAO;
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
+    public CreateHandler() {
     }
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
         CreateRequest createRequest = new Gson().fromJson(request.body(), CreateRequest.class);
         createRequest.setAuthToken(request.headers("Authorization"));
-        CreateResult createResult = new CreateService().createGame(createRequest, userDAO, authDAO, gameDAO);
+        CreateResult createResult = new CreateService().createGame(createRequest);
         if (createResult.getMessage() == null){
             response.status(200);
         } else if (createResult.getMessage().equals("Error: unauthorized")) {
