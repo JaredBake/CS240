@@ -18,6 +18,7 @@ public class JoinService {
         // Verify Token
         try {
             authDAO.verifyToken(joinRequest.getAuthToken());
+            joinResult.setAuthToken(joinRequest.getAuthToken());
         }catch (DataAccessException badToken){
             joinResult.setMessage(badToken.getMessage());
             return joinResult;
@@ -30,7 +31,14 @@ public class JoinService {
             return joinResult;
         }
         // See if we are joining or observing a game
-        String username = authDAO.findUser(joinRequest.getAuthToken());
+        String username;
+        try {
+            username = authDAO.findUser(joinRequest.getAuthToken());
+            joinResult.setUsername(username);
+        }catch (DataAccessException badUser){
+            joinResult.setMessage(badUser.getMessage());
+            return joinResult;
+        }
         if (joinRequest.getPlayerColor() == null){
             gameDAO.observeGame(joinRequest, userDAO);
         }else{

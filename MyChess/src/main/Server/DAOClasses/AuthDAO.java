@@ -142,10 +142,12 @@ public class AuthDAO {
         try (var preparedStatement = conn.prepareStatement("SELECT username FROM auth WHERE authtoken=?")) {
             preparedStatement.setString(1, authToken);
             try (var rs = preparedStatement.executeQuery()) {
-                while (rs.next()) {
+                if (rs.next()) {
                     username = rs.getString("username");
 
                     System.out.printf("authToken: %s", username);
+                }else {
+                    throw new DataAccessException("Error: bad request");
                 }
             }
         } catch (SQLException exception) {

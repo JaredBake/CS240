@@ -19,13 +19,14 @@ import passoffTests.testClasses.TestModels;
 import javax.xml.crypto.Data;
 import java.awt.image.RGBImageFilter;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Phase4Tests {
     private String existingAuth;
     private static Database database = new Database();
 
-    private static User user = new User("testPassword", "testPassword","urim@thummim.net");
+    private static User user = new User("testPassword", "testUsername","urim@thummim.net");
 
 
 
@@ -91,6 +92,8 @@ public class Phase4Tests {
         JoinRequest joinRequest = new JoinRequest();
         joinRequest.setGameID(createResult.getGameID());
         joinRequest.setPlayerColor("WHITE");
+        joinRequest.setUsername(user.getUsername());
+        joinRequest.setAuthToken(existingAuth);
         JoinResult joinResult = new JoinService().join(joinRequest);
         if (joinResult.getMessage() != null){
             throw new DataAccessException("Error: Could not join game");
@@ -99,6 +102,7 @@ public class Phase4Tests {
 
         //have second user join
         joinRequest.setPlayerColor("BLACK");
+        joinRequest.setUsername("Emma");
         joinResult = new JoinService().join(joinRequest);
         if (joinResult.getMessage() != null){
             throw new DataAccessException("Error: Could not join game");
@@ -110,6 +114,7 @@ public class Phase4Tests {
 
         //get list of games
         GameListRequest listRequest = new GameListRequest();
+        listRequest.setAuthToken(existingAuth);
         GameListResult listResult1 = new GameListService().gameList(listRequest);
         //------------------------------------------------------------------------------------------------------------
 
@@ -126,8 +131,8 @@ public class Phase4Tests {
         //list games, see both user in game
         //also checks that first user still has auth in database
         listRequest = new GameListRequest();
+        listRequest.setAuthToken(existingAuth);
         GameListResult listResult2 = new GameListService().gameList(listRequest);
-
         Assertions.assertEquals(listResult1.getGames(), listResult2.getGames(), "Missing game(s) in database after restart");
 
         //set games & check if swapped

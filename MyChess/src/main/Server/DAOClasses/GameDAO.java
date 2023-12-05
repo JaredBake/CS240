@@ -28,8 +28,6 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 public class GameDAO {
 
     private Database database = new Database();
-    private Map<Integer, Game> game_map = new HashMap<>();
-
     /**
      * method for inserting a new game into the database.
      */
@@ -83,32 +81,36 @@ public class GameDAO {
         }
         try (var preparedStatement = conn.prepareStatement("Select * FROM games WHERE gameID=?", RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, String.valueOf(gameID));
-
-            // get the return statement and pull all the info needed from it
             var rs = preparedStatement.executeQuery();
-            var json = rs.getString("chessGame");
-            var gameName = rs.getString("gamename");
-            var whitePlayer = rs.getString("whiteplayer");
-            var blackPlayer = rs.getString("blackplayer");
-            Game chessGame = new Game();
+            if (rs.next()) {
+                // get the return statement and pull all the info needed from it
 
-            // Declare all the Adapters
-            var builder = new GsonBuilder();
-            builder.registerTypeAdapter(ChessGame.class, new GameAdapter());
-            builder.registerTypeAdapter(ChessPosition.class, new PositionAdapter());
-            builder.registerTypeAdapter(ChessPiece.class, new PieceAdapter());
-            builder.registerTypeAdapter(ChessBoard.class, new BoardAdapter());
+                var json = rs.getString("chessGame");
+                var gameName = rs.getString("gamename");
+                var whitePlayer = rs.getString("whiteplayer");
+                var blackPlayer = rs.getString("blackplayer");
+                Game chessGame = new Game();
 
-            // Define the game and all the players in the game
-            chessGame.setGame(builder.create().fromJson(json, ChessGameIm.class));
-            chessGame.setGameName(gameName);
-            chessGame.setWhiteUsername(whitePlayer);
-            chessGame.setBlackUsername(blackPlayer);
+                // Declare all the Adapters
+                var builder = new GsonBuilder();
+                builder.registerTypeAdapter(ChessGame.class, new GameAdapter());
+                builder.registerTypeAdapter(ChessPosition.class, new PositionAdapter());
+                builder.registerTypeAdapter(ChessPiece.class, new PieceAdapter());
+                builder.registerTypeAdapter(ChessBoard.class, new BoardAdapter());
 
-            return chessGame;
+                // Define the game and all the players in the game
+                chessGame.setGame(builder.create().fromJson(json, ChessGameIm.class));
+                chessGame.setGameName(gameName);
+                chessGame.setWhiteUsername(whitePlayer);
+                chessGame.setBlackUsername(blackPlayer);
+
+                return chessGame;
+            }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
         }
+
+        return null;
     }
 
 
@@ -149,8 +151,8 @@ public class GameDAO {
         Connection conn = null;
         try {
             conn = database.getConnection();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        } catch (DataAccessException exception) {
+            throw new RuntimeException(exception);
         }
         try (var preparedStatement = conn.prepareStatement("Select * FROM games", RETURN_GENERATED_KEYS)) {
 
@@ -194,32 +196,48 @@ public class GameDAO {
     public void claimSpot(String username, Integer gameID, String playerColor) throws DataAccessException {
         // TODO: Check
         try (Connection conn = database.getConnection()) {
-            var getPlayerStatus = conn.prepareStatement("SELECT (whiteplayer, blackplayer) FROM games WHERE gameID=?");
+            var getPlayerStatus = conn.prepareStatement("SELECT whiteplayer, blackplayer FROM games WHERE gameID=?");
             getPlayerStatus.setInt(1,gameID);
             var rs = getPlayerStatus.executeQuery();
-            String whiteName = rs.getString("whiteplayer");
-            String blackName = rs.getString("blackplayer");
+            if (rs.next()) {
+                String whiteName = rs.getString("whiteplayer");
+                String blackName = rs.getString("blackplayer");
 
-            if (playerColor.equals("BLACK")) {
-                if (blackName == null) {
+                if (playerColor.equals("BLACK")) {
+                    if (blackName == null) {
+                        var setPlayerStatus = conn.prepareStatement("UPDATE games SET blackplayer=? WHERE gameID=?");
+                        setPlayerStatus.setString(1, username);
+                        setPlayerStatus.setInt(2, gameID);
+                        setPlayerStatus.executeUpdate();
+                    } else {
+                        throw new DataAccessException("Error: already taken");
+                    }
+                } else if (playerColor.equals("WHITE")) {
+                    if (whiteName == null) {
+                        var setPlayerStatus = conn.prepareStatement("UPDATE games SET whiteplayer=? WHERE gameID=?");
+                        setPlayerStatus.setString(1, username);
+                        setPlayerStatus.setInt(2, gameID);
+                        setPlayerStatus.executeUpdate();
+                    } else {
+                        throw new DataAccessException("Error: already taken");
+                    }
+                } else {
+                    throw new DataAccessException("Error: bad request");
+                }
+            }else{
+                if (playerColor.equals("BLACK")) {
                     var setPlayerStatus = conn.prepareStatement("UPDATE games SET blackplayer=? WHERE gameID=?");
                     setPlayerStatus.setString(1, username);
                     setPlayerStatus.setInt(2, gameID);
                     setPlayerStatus.executeUpdate();
-                } else {
-                    throw new DataAccessException("Error: already taken");
-                }
-            } else if (playerColor.equals("WHITE")) {
-                if (whiteName == null) {
+                } else if (playerColor.equals("WHITE")) {
                     var setPlayerStatus = conn.prepareStatement("UPDATE games SET whiteplayer=? WHERE gameID=?");
                     setPlayerStatus.setString(1, username);
                     setPlayerStatus.setInt(2, gameID);
                     setPlayerStatus.executeUpdate();
                 } else {
-                    throw new DataAccessException("Error: already taken");
+                    throw new DataAccessException("Error: bad request");
                 }
-            } else {
-                throw new DataAccessException("Error: bad request");
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
