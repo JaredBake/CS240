@@ -9,6 +9,7 @@ import Server.Results.CreateResult;
 import dataAccess.DataAccessException;
 
 import javax.xml.crypto.Data;
+import java.sql.SQLException;
 
 public class CreateService {
     public CreateResult createGame(CreateRequest request) {
@@ -23,7 +24,11 @@ public class CreateService {
             return createResult;
         }
         // Create a new game
-        createResult.setGameID(gameDAO.create(request.getGameName()));
+        try {
+            createResult.setGameID(gameDAO.create(request.getGameName()));
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
+        }
         return createResult;
     }
 

@@ -9,6 +9,12 @@ public class ChessGameIm implements ChessGame {
     ChessBoard board;
     ChessPosition King;
 
+    public ChessGameIm(){
+        turn = TeamColor.WHITE;
+        board = new ChessBoardIm();
+        board.resetBoard();
+    }
+
     @Override
     public TeamColor getTeamTurn() {
 

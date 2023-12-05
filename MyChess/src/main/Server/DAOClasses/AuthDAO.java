@@ -97,27 +97,24 @@ public class AuthDAO {
         }
     }
 
-    public boolean verifyToken(String token) throws DataAccessException {
-        // UPDATED
+    public void verifyToken(String token) throws DataAccessException {
+        // TODO: REDO
         Connection conn = database.getConnection();
         String authtoken = "";
-        try (var preparedStatement = conn.prepareStatement("SELECT authtoken FROM auth ")) {
+        try (var preparedStatement = conn.prepareStatement("SELECT authtoken FROM auth WHERE authtoken=?")) {
             preparedStatement.setString(1, token);
-            try (var rs = preparedStatement.executeQuery()) {
-                while (rs.next()) {
-                    authtoken = rs.getString("authtoken");
-
-                    System.out.printf("authToken: %s", authtoken);
+            var rs = preparedStatement.executeQuery();
+            try {
+                if (!rs.next()){
+                    throw new DataAccessException("Error: unauthorized");
                 }
+                String temptoken = rs.getString("authtoken");
+            } catch (SQLException e) {
+                throw new DataAccessException("Error: unauthorized");
             }
         } catch (SQLException exception) {
-            try {
-                throw new SQLException("Error: unathorized");
-            } catch (SQLException exception1) {
-                throw new RuntimeException(exception1);
-            }
+            throw new RuntimeException(exception);
         }
-        return true;
     }
 
 
@@ -129,7 +126,7 @@ public class AuthDAO {
             throw new RuntimeException(exception);
         }
 
-        try (var preparedStatement = conn.prepareStatement("UPDATE auth SET authtoken = null WHERE=?")) {
+        try (var preparedStatement = conn.prepareStatement("DELETE FROM auth WHERE authtoken=?")) {
             preparedStatement.setString(1, token);
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
@@ -164,11 +161,18 @@ public class AuthDAO {
             var createDbStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS mydatabase");
             createDbStatement.executeUpdate();
 
+            // IF need to update Table run this code
+            /*
+            var dropAuthTable = "DROP TABLE IF EXISTS auth";
+
+            try (var dropTableStatement = conn.prepareStatement(dropAuthTable)) {
+                dropTableStatement.executeUpdate();
+            }*/
             var createAuthTable = """
             CREATE TABLE  IF NOT EXISTS auth (
                 authtoken VARCHAR(255) NOT NULL,
                 username VARCHAR(255) NOT NULL,
-                PRIMARY KEY (username)
+                PRIMARY KEY (authtoken)
             )""";
 
 
