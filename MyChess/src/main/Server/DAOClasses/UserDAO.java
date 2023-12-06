@@ -6,6 +6,7 @@ import dataAccess.DataAccessException;
 import dataAccess.Database;
 
 import java.sql.Connection;
+import java.sql.DataTruncation;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -21,9 +22,12 @@ public class UserDAO {
     private Map<String, User> users_map = new HashMap<>();
     private Database database = new Database();
 
-public void createUser(User user) throws SQLException {
+public void createUser(User user) throws SQLException, DataAccessException {
         // UPDATED
         Connection conn;
+        if (user.getUsername() == null){
+            return;
+        }
         try {
             conn = database.getConnection();
         } catch (DataAccessException exception) {
@@ -38,8 +42,19 @@ public void createUser(User user) throws SQLException {
                 preparedStatement.executeUpdate();
             }catch (SQLException exception){
                 throw new SQLException("Error: already taken");
+            }finally {
+                try {
+                    database.closeConnection(conn);
+                } catch (DataAccessException exception) {
+                    throw new RuntimeException(exception);
+                }
             }
         }
+    try {
+        database.closeConnection(conn);
+    } catch (DataAccessException e) {
+        throw new RuntimeException(e);
+    }
 }
 
 //    void deleteUser(Connection conn, String username) throws SQLException {
@@ -55,6 +70,9 @@ public void createUser(User user) throws SQLException {
     public User find(String username, String password) throws DataAccessException{
         // UPDATED
         Connection conn;
+        if (username == null){
+            return null;
+        }
         User user = null;
         try {
             conn = database.getConnection();
@@ -70,30 +88,22 @@ public void createUser(User user) throws SQLException {
                     var email = rs.getString("email");
 
                     if (!pass.equals(password)){
-                        throw new DataAccessException("Error: wrong password");
+                        return null;
                     }
 
                     user = new User(pass, name, email);
-                    System.out.printf("username: %s, password: %s, email: %s", name, pass, email);
                 }
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
         return user;
-    }
-
-
-    /**
-     * Finds all users that have been created
-     */
-    public Integer findAll(){
-        // TODO: UPDATE LAST
-        if (!users_map.keySet().isEmpty()){
-            return users_map.keySet().size();
-        }else {
-            return 0;
-        }
     }
 
     /**
@@ -112,6 +122,12 @@ public void createUser(User user) throws SQLException {
             preparedStatement.executeUpdate();
         }catch (SQLException exception){
             throw new SQLException("Error: unexpected error");
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

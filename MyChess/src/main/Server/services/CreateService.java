@@ -16,11 +16,16 @@ public class CreateService {
         CreateResult createResult = new CreateResult();
         AuthDAO authDAO = new AuthDAO();
         GameDAO gameDAO = new GameDAO();
+        String username;
         // Verify authToken
         try{
-            authDAO.verifyToken(request.getAuthToken());
+            username = authDAO.verifyToken(request.getAuthToken());
         }catch (DataAccessException wrong_info){
             createResult.setMessage(wrong_info.getMessage());
+            return createResult;
+        }
+        if (username == null){
+            createResult.setMessage("Error: unauthorized");
             return createResult;
         }
         // Create a new game

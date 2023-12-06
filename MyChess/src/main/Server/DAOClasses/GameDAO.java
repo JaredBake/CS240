@@ -8,20 +8,14 @@ import Server.Adapters.PositionAdapter;
 import chess.*;
 import com.google.gson.Gson;
 import Server.Model.Game;
-import Server.Model.User;
-import Server.Requests.JoinRequest;
 import com.google.gson.GsonBuilder;
 import dataAccess.DataAccessException;
 import dataAccess.Database;
 import chess.ChessGame;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -50,19 +44,21 @@ public class GameDAO {
         } catch (DataAccessException exception) {
             throw new RuntimeException(exception);
         }
-        if (game_name.matches("[a-zA-Z]+")) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gamename, gameID, chessGame) VALUES(?, ?, ?)", RETURN_GENERATED_KEYS)) {
-                preparedStatement.setString(1, game_name);
-                preparedStatement.setInt(2, gameID);
-
-                // Serialize and store the friend JSON.
-                ChessGame game = new ChessGameIm();
-                var json = new Gson().toJson(game);
-                preparedStatement.setString(3, json);
-
-                preparedStatement.executeUpdate();
-            }catch (SQLException exception){
-                throw new SQLException("Error: already taken");
+        try (var preparedStatement = conn.prepareStatement("INSERT INTO games (gamename, gameID, chessGame) VALUES(?, ?, ?)", RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, game_name);
+            preparedStatement.setInt(2, gameID);
+            // Serialize and store the friend JSON.
+            ChessGame game = new ChessGameIm();
+            var json = new Gson().toJson(game);
+            preparedStatement.setString(3, json);
+            preparedStatement.executeUpdate();
+        }catch (SQLException exception){
+            throw new SQLException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
             }
         }
         return gameID;
@@ -74,22 +70,18 @@ public class GameDAO {
     public Game find(Integer gameID) throws DataAccessException{
         // UPDATED
         Connection conn = null;
-        try {
-            conn = database.getConnection();
-        } catch (DataAccessException exception) {
-            throw new RuntimeException(exception);
-        }
-        try (var preparedStatement = conn.prepareStatement("Select * FROM games WHERE gameID=?", RETURN_GENERATED_KEYS)) {
+        Game chessGame = new Game();
+        conn = database.getConnection();
+        try (var preparedStatement = conn.prepareStatement("Select * FROM games WHERE gameID=?")) {
             preparedStatement.setString(1, String.valueOf(gameID));
             var rs = preparedStatement.executeQuery();
             if (rs.next()) {
                 // get the return statement and pull all the info needed from it
 
-                var json = rs.getString("chessGame");
-                var gameName = rs.getString("gamename");
-                var whitePlayer = rs.getString("whiteplayer");
-                var blackPlayer = rs.getString("blackplayer");
-                Game chessGame = new Game();
+                String json = rs.getString("chessGame");
+                String gameName = rs.getString("gamename");
+                String whitePlayer = rs.getString("whiteplayer");
+                String blackPlayer = rs.getString("blackplayer");
 
                 // Declare all the Adapters
                 var builder = new GsonBuilder();
@@ -99,18 +91,25 @@ public class GameDAO {
                 builder.registerTypeAdapter(ChessBoard.class, new BoardAdapter());
 
                 // Define the game and all the players in the game
+                chessGame.setGameID(gameID);
                 chessGame.setGame(builder.create().fromJson(json, ChessGameIm.class));
                 chessGame.setGameName(gameName);
                 chessGame.setWhiteUsername(whitePlayer);
                 chessGame.setBlackUsername(blackPlayer);
 
                 return chessGame;
+            }else {
+                throw new DataAccessException("Error: bad request");
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException exception) {
+                throw new RuntimeException(exception);
+            }
         }
-
-        return null;
     }
 
 
@@ -130,7 +129,7 @@ public class GameDAO {
      * Clears all games from the database
      */
     public void clearAll() {
-        // TODO: UPDATE
+        // UPDATED
         Connection conn;
         try {
             conn = database.getConnection();
@@ -138,15 +137,21 @@ public class GameDAO {
             throw new RuntimeException(exception);
         }
 
-        try (var preparedStatement = conn.prepareStatement("DELETE FROM auth")) {
+        try (var preparedStatement = conn.prepareStatement("DELETE FROM games")) {
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     public ArrayList<Game> getGameList(){
-        // TODO: UPDATE
+        // UPDATED
         ArrayList<Game> gameList = new ArrayList<>();
         Connection conn = null;
         try {
@@ -163,6 +168,7 @@ public class GameDAO {
                 String gameName = rs.getString("gamename");
                 var whitePlayer = rs.getString("whiteplayer");
                 var blackPlayer = rs.getString("blackplayer");
+                Integer gameID = rs.getInt("gameID");
                 Game chessGame = new Game();
 
                 // Declare all the Adapters
@@ -173,6 +179,7 @@ public class GameDAO {
                 builder.registerTypeAdapter(ChessBoard.class, new BoardAdapter());
 
                 // Define the game and all the players in the game
+                chessGame.setGameID(gameID);
                 chessGame.setGame(builder.create().fromJson(json, ChessGameIm.class));
                 chessGame.setGameName(gameName);
                 chessGame.setWhiteUsername(whitePlayer);
@@ -182,12 +189,23 @@ public class GameDAO {
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
         return gameList;
     }
 
 
-    public void observeGame(JoinRequest joinRequest, UserDAO userDAO) throws DataAccessException {
+    public void observeGame(String username) throws DataAccessException {
+        HashSet<String> observers = new HashSet<>();
+        if (username == null){
+            throw new DataAccessException("Error: bad request");
+        }
+        observers.add(username);
 
     }
     /**
@@ -200,9 +218,12 @@ public class GameDAO {
             getPlayerStatus.setInt(1,gameID);
             var rs = getPlayerStatus.executeQuery();
             if (rs.next()) {
+                if (playerColor == null){
+                    observeGame(username);
+                    return;
+                }
                 String whiteName = rs.getString("whiteplayer");
                 String blackName = rs.getString("blackplayer");
-
                 if (playerColor.equals("BLACK")) {
                     if (blackName == null) {
                         var setPlayerStatus = conn.prepareStatement("UPDATE games SET blackplayer=? WHERE gameID=?");
@@ -222,25 +243,28 @@ public class GameDAO {
                         throw new DataAccessException("Error: already taken");
                     }
                 } else {
-                    throw new DataAccessException("Error: bad request");
+                    throw new DataAccessException("Error: already taken");
                 }
-            }else{
-                if (playerColor.equals("BLACK")) {
-                    var setPlayerStatus = conn.prepareStatement("UPDATE games SET blackplayer=? WHERE gameID=?");
-                    setPlayerStatus.setString(1, username);
-                    setPlayerStatus.setInt(2, gameID);
-                    setPlayerStatus.executeUpdate();
-                } else if (playerColor.equals("WHITE")) {
-                    var setPlayerStatus = conn.prepareStatement("UPDATE games SET whiteplayer=? WHERE gameID=?");
-                    setPlayerStatus.setString(1, username);
-                    setPlayerStatus.setInt(2, gameID);
-                    setPlayerStatus.executeUpdate();
-                } else {
-                    throw new DataAccessException("Error: bad request");
+            } else {
+                    if (playerColor == null) {
+                        throw new DataAccessException("Error: bad request");
+                    }
+                    if (playerColor.equals("BLACK")) {
+                        var setPlayerStatus = conn.prepareStatement("UPDATE games SET blackplayer=? WHERE gameID=?");
+                        setPlayerStatus.setString(1, username);
+                        setPlayerStatus.setInt(2, gameID);
+                        setPlayerStatus.executeUpdate();
+                    } else if (playerColor.equals("WHITE")) {
+                        var setPlayerStatus = conn.prepareStatement("UPDATE games SET whiteplayer=? WHERE gameID=?");
+                        setPlayerStatus.setString(1, username);
+                        setPlayerStatus.setInt(2, gameID);
+                        setPlayerStatus.executeUpdate();
+                    } else {
+                        throw new DataAccessException("Error: bad request");
+                    }
                 }
-            }
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

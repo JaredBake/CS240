@@ -30,6 +30,10 @@ public class LoginService {
             loginResult.setMessage(wrong_info.getMessage());
             return loginResult;
         }
+        if (user == null){
+            loginResult.setMessage("Error: unauthorized");
+            return loginResult;
+        }
         // Create and set the variables for registerResult
         try {
             loginResult.setAuthToken(authDAO.createToken(user.getUsername()));

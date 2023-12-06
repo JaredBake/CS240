@@ -26,6 +26,9 @@ public class AuthDAO {
     private Database database = new Database();
     public String createToken(String username) throws SQLException {
         // UPDATED
+        if (username == null){
+            return null;
+        }
         Connection conn;
         AuthToken authToken = new AuthToken();
         authToken.setAuthToken(UUID.randomUUID().toString());
@@ -44,6 +47,12 @@ public class AuthDAO {
             preparedStatement.executeUpdate();
         }catch (SQLException exception){
             throw new SQLException("Could not create a new authToken");
+        }finally{
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
         return authToken.getAuthToken();
     }
@@ -57,23 +66,25 @@ public class AuthDAO {
             throw new RuntimeException(e);
         }
         var auth = new ArrayList<AuthToken>();
-        try (var preparedStatement = conn.prepareStatement("SELECT username, authToken FROM auth")) {
+        try (var preparedStatement = conn.prepareStatement("SELECT * FROM auth")) {
             try (var rs = preparedStatement.executeQuery()) {
                 while (rs.next()) {
-                    var username = rs.getString("name");
 
-                    // Read and deserialize the friend JSON.
-                    var json = rs.getString("authToken");
-                    AuthToken token = new Gson().fromJson(json, AuthToken.class);
-
+                    AuthToken token = new AuthToken();
+                    token.setAuthToken(rs.getString("authToken"));
                     AuthToken authToken = new AuthToken();
-                    authToken.setUsername(username);
                     authToken.setAuthToken(token.getAuthToken());
                     auth.add(authToken);
                 }
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
         return auth.size();
     }
@@ -89,31 +100,43 @@ public class AuthDAO {
         } catch (DataAccessException exception) {
             throw new RuntimeException(exception);
         }
-
         try (var preparedStatement = conn.prepareStatement("DELETE FROM auth ")) {
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public void verifyToken(String token) throws DataAccessException {
+    public String verifyToken(String token) throws DataAccessException {
         // TODO: REDO
         Connection conn = database.getConnection();
-        String authtoken = "";
-        try (var preparedStatement = conn.prepareStatement("SELECT authtoken FROM auth WHERE authtoken=?")) {
+        String username;
+        try (var preparedStatement = conn.prepareStatement("SELECT username FROM auth WHERE authtoken=?")) {
             preparedStatement.setString(1, token);
             var rs = preparedStatement.executeQuery();
             try {
                 if (!rs.next()){
-                    throw new DataAccessException("Error: unauthorized");
+                    return null;
                 }
-                String temptoken = rs.getString("authtoken");
-            } catch (SQLException e) {
+                username = rs.getString("username");
+                return username;
+            } catch (SQLException exception) {
                 throw new DataAccessException("Error: unauthorized");
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException exception) {
+                throw new RuntimeException(exception);
+            }
         }
     }
 
@@ -131,6 +154,12 @@ public class AuthDAO {
             preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -144,14 +173,19 @@ public class AuthDAO {
             try (var rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     username = rs.getString("username");
-
-                    System.out.printf("authToken: %s", username);
+//                    System.out.printf("authToken: %s", username);
                 }else {
                     throw new DataAccessException("Error: bad request");
                 }
             }
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
+        }finally {
+            try {
+                database.closeConnection(conn);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
         return username;
 //        throw new DataAccessException("Error: unauthorized");
@@ -180,6 +214,8 @@ public class AuthDAO {
 
             try (var createTableStatement = conn.prepareStatement(createAuthTable)) {
                 createTableStatement.executeUpdate();
+            }finally {
+                database.closeConnection(conn);
             }
         } catch (DataAccessException exception) {
             throw new RuntimeException(exception);

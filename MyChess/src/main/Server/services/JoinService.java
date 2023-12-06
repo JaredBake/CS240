@@ -3,11 +3,13 @@ package Server.services;
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
+import Server.Model.Game;
 import Server.Requests.JoinRequest;
 import Server.Results.JoinResult;
 import dataAccess.DataAccessException;
 
 import javax.xml.crypto.Data;
+import java.util.Objects;
 
 public class JoinService {
     public JoinResult join(JoinRequest joinRequest) throws DataAccessException {
@@ -15,39 +17,39 @@ public class JoinService {
         AuthDAO authDAO = new AuthDAO();
         GameDAO gameDAO = new GameDAO();
         JoinResult joinResult = new JoinResult();
+        String username;
         // Verify Token
         try {
-            authDAO.verifyToken(joinRequest.getAuthToken());
-            joinResult.setAuthToken(joinRequest.getAuthToken());
+            username = authDAO.verifyToken(joinRequest.getAuthToken());
         }catch (DataAccessException badToken){
             joinResult.setMessage(badToken.getMessage());
             return joinResult;
         }
+        if (username == null){
+            joinResult.setMessage("Error: unauthorized");
+            return joinResult;
+        }
+        joinRequest.setUsername(username);
         // Verify GameID
-        try {
+        try{
             gameDAO.find(joinRequest.getGameID());
-        }catch (DataAccessException invalid){
-            joinResult.setMessage(invalid.getMessage());
+        } catch (DataAccessException badID) {
+            joinResult.setMessage(badID.getMessage());
             return joinResult;
         }
         // See if we are joining or observing a game
-        String username;
-        try {
-            username = authDAO.findUser(joinRequest.getAuthToken());
-            joinResult.setUsername(username);
-        }catch (DataAccessException badUser){
-            joinResult.setMessage(badUser.getMessage());
-            return joinResult;
-        }
         if (joinRequest.getPlayerColor() == null){
-            gameDAO.observeGame(joinRequest, userDAO);
-        }else{
-            try{
-                gameDAO.claimSpot(username, joinRequest.getGameID(), joinRequest.getPlayerColor());
-            }catch (DataAccessException spotTaken){
-                joinResult.setMessage(spotTaken.getMessage());
+            gameDAO.observeGame(joinRequest.getUsername());
+        }else if (joinRequest.getPlayerColor().equals("BLACK") || joinRequest.getPlayerColor().equals("WHITE")){
+            try {
+                gameDAO.claimSpot(joinRequest.getUsername(),joinRequest.getGameID(),joinRequest.getPlayerColor());
+            }catch (DataAccessException badinfo){
+                joinResult.setMessage(badinfo.getMessage());
                 return joinResult;
             }
+        }else {
+            joinResult.setMessage("Error: already taken");
+            return joinResult;
         }
         return joinResult;
     }

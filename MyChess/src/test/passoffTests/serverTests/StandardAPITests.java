@@ -530,7 +530,7 @@ public class StandardAPITests {
     @DisplayName("Join Bad Game ID")
     public void badGameIDJoin() {
         //create game
-        createRequest = new TestModels.TestCreateRequest();
+
         TestModels.TestCreateResult createResult = serverFacade.createGame(createRequest, existingAuth);
 
         //join as white
