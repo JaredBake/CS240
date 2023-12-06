@@ -279,9 +279,7 @@ public class Phase4Tests {
     @Order(9)
     @DisplayName("claimSpot Created Game")
     public void goodclaim() throws DataAccessException {
-        UserDAO userDAO = new UserDAO();
         GameDAO gameDAO = new GameDAO();
-        AuthDAO authDAO = new AuthDAO();
         ArrayList<Game> list1 = new ArrayList<>();
         ArrayList<Game> list2 = new ArrayList<>();
         //have first user join
