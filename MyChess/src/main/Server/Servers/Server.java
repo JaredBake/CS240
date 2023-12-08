@@ -23,6 +23,7 @@ public class Server implements Route {
         Spark.port(8080);
         // Register a directory for hosting static files
         Spark.externalStaticFileLocation("web");
+        Spark.before((request, response) -> {System.out.println(requestInfoToString(request));});
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.delete("/db", new ClearHandler());
@@ -33,10 +34,10 @@ public class Server implements Route {
         Spark.post("/game", new CreateHandler());
         Spark.put("/game", new JoinHandler());
     }
+    private static String requestInfoToString(Request request) {
+        return request.requestMethod() + " " + request.url() + " " + request.body() + " " + request.headers("Authorization");
+    }
 
-/*
-UUID.randomUUID().toString()
- */
 
     @Override
     public Object handle(Request request, Response response) throws Exception {

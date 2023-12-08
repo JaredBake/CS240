@@ -1,6 +1,7 @@
 package Model;
 
 import chess.ChessGame;
+import chess.ChessGameIm;
 
 /**
  * Gets information about
@@ -26,7 +27,7 @@ public class Game {
     /**
      * Current game
      */
-    ChessGame game;
+    ChessGameIm game;
 
     public Game(){
         gameID = null;
@@ -66,7 +67,7 @@ public class Game {
     }
 
     public void setGame(ChessGame game) {
-        this.game = game;
+        this.game = (ChessGameIm) game;
     }
 
     public void setGameID(Integer gameID) {

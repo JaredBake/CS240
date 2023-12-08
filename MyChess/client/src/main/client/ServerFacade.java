@@ -176,10 +176,10 @@ public class ServerFacade {
         http.addRequestProperty("Authorization", request.getAuthToken());
 
     // Write out the body
-        try (var outputStream = http.getOutputStream()) {
-            var jsonBody = new Gson().toJson(request);
-            outputStream.write(jsonBody.getBytes());
-        }
+//        try (var outputStream = http.getOutputStream()) {
+//            var jsonBody = new Gson().toJson(request);
+//            outputStream.write(jsonBody.getBytes());
+//        }
 
         // Make the request
         http.connect();

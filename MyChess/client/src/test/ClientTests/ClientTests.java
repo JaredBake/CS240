@@ -84,9 +84,10 @@ public class ClientTests {
     @Order(5)
     @DisplayName("Success Login")
     public void goodLogin() throws Exception {
+        createUser("Jacob");
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("testUsername");
-        loginRequest.setPassword("testPassword");
+        loginRequest.setUsername("Jacob");
+        loginRequest.setPassword("password");
         LoginResult loginResult;
 
         loginResult = server.login(loginRequest);
@@ -150,8 +151,7 @@ public class ClientTests {
 
         // Create a authToken
         GameListRequest request = new GameListRequest();
-        request.setAuthToken(createUser("Kris"));
-
+        request.setAuthToken(createUser("Oberma"));
         GameListResult result = new GameListResult();
         result = server.list(request);
         Assertions.assertNotNull(result.getGames(),"Did not return Games");
@@ -160,22 +160,52 @@ public class ClientTests {
     @Test
     @Order(10)
     @DisplayName("Failed Create Game")
-    public void badList(){
+    public void badList() throws Exception {
+        // Create a game to call
+        createGame("Game3");
 
+        // Create a authToken
+        GameListRequest request = new GameListRequest();
+        request.setAuthToken(createUser("Aberma"));
+        GameListResult result = new GameListResult();
+        result = server.list(request);
+        Assertions.assertNotNull(result.getGames(),"Did not return Games");
     }
 
     @Test
     @Order(11)
     @DisplayName("Failed Create Game")
-    public void goodJoin(){
+    public void goodJoin() throws Exception {
+        // Create User
+        String token = createUser("Steve");
+        // Create Game to join
+        Integer gameID = createGame("Game4");
 
+        JoinRequest joinRequest = new JoinRequest();
+        joinRequest.setPlayerColor("WHITE");
+        joinRequest.setGameID(gameID);
+        joinRequest.setUsername("Steve");
+        joinRequest.setAuthToken(token);
+        JoinResult result = server.join(joinRequest);
+        Assertions.assertNull(result.getMessage(), "Threw an error");
     }
 
     @Test
     @Order(12)
     @DisplayName("Failed Create Game")
-    public void badJoin(){
+    public void badJoin() throws Exception {
+        // Create User
+        String token = createUser("Klye");
+        // Create Game to join
+        Integer gameID = createGame("Game5");
 
+        JoinRequest joinRequest = new JoinRequest();
+        joinRequest.setPlayerColor("WHITE");
+        joinRequest.setGameID(546);
+        joinRequest.setUsername("Klye");
+        joinRequest.setAuthToken(token);
+        JoinResult result = server.join(joinRequest);
+        Assertions.assertNotNull(result.getMessage(), "Did not throw an error");
     }
 
 
@@ -194,11 +224,9 @@ public class ClientTests {
         try {
             result = server.login(request);
         } catch (Exception exception) {
-            Assertions.assertTrue(true, exception.getMessage());
+            Assertions.assertTrue(false, exception.getMessage());
             return;
         }
-
-
         Assertions.assertNull(result.getAuthToken(), "Did not throw and Error");
     }
 
@@ -211,11 +239,12 @@ public class ClientTests {
         request.setEmail("email");
         return server.register(request).getAuthToken();
     }
-    public void createGame(String name) throws Exception {
+    public Integer createGame(String name) throws Exception {
         CreateRequest createRequest = new CreateRequest();
         createRequest.setAuthToken(createUser("Lik"));
         createRequest.setGameName(name);
 
         CreateResult result = server.create(createRequest);
+        return result.getGameID();
     }
 }

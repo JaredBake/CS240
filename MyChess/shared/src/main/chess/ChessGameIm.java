@@ -6,8 +6,8 @@ import java.util.Set;
 
 public class ChessGameIm implements ChessGame {
     TeamColor turn;
-    ChessBoard board;
-    ChessPosition King;
+    ChessBoardIm board;
+    ChessPositionIm King;
 
     public ChessGameIm(){
         turn = TeamColor.WHITE;
@@ -136,7 +136,7 @@ public class ChessGameIm implements ChessGame {
         all_pieces = getAllPieces(b,tc);
         for (ChessPosition p : all_pieces) {
             if (b.getPiece(p).getPieceType() == ChessPiece.PieceType.KING && tc == b.getPiece(p).getTeamColor()) {
-                King = p;
+                King = (ChessPositionIm) p;
             }
             if (tc != b.getPiece(p).getTeamColor()) {
                 attacking_moves.addAll(b.getPiece(p).pieceMoves(b, p));
@@ -206,7 +206,7 @@ public class ChessGameIm implements ChessGame {
 
     @Override
     public void setBoard(ChessBoard board) {
-        this.board = board;
+        this.board = (ChessBoardIm) board;
     }
 
     @Override
