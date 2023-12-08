@@ -2,13 +2,10 @@ package Server.services;
 
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
-import Server.DAOClasses.UserDAO;
-import Server.Requests.CreateRequest;
-import Server.Requests.LoginRequest;
-import Server.Results.CreateResult;
+import Requests.CreateRequest;
+import Results.CreateResult;
 import dataAccess.DataAccessException;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 public class CreateService {

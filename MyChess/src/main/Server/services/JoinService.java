@@ -3,13 +3,9 @@ package Server.services;
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
-import Server.Model.Game;
-import Server.Requests.JoinRequest;
-import Server.Results.JoinResult;
+import Requests.JoinRequest;
+import Results.JoinResult;
 import dataAccess.DataAccessException;
-
-import javax.xml.crypto.Data;
-import java.util.Objects;
 
 public class JoinService {
     public JoinResult join(JoinRequest joinRequest) throws DataAccessException {

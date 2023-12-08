@@ -1,16 +1,10 @@
 package Server.Handlers;
 
-import Server.Model.User;
-import Server.Requests.ClearRequest;
-import Server.Requests.RegisterRequest;
-import Server.Results.LoginResult;
+import Model.User;
+import Results.LoginResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import spark.Request;
-import spark.Response;
 import spark.Route;
-import spark.*;
-import java.util.*;
 
 public abstract class Handler implements Route {
 

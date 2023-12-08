@@ -2,8 +2,6 @@ package Server.Adapters;
 
 import chess.ChessBoard;
 import chess.ChessBoardIm;
-import chess.ChessGame;
-import chess.ChessGameIm;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;

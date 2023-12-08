@@ -2,8 +2,8 @@ package Server.services;
 
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
-import Server.Requests.GameListRequest;
-import Server.Results.GameListResult;
+import Requests.GameListRequest;
+import Results.GameListResult;
 import dataAccess.DataAccessException;
 
 public class GameListService {

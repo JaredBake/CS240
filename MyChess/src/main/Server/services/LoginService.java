@@ -2,12 +2,11 @@ package Server.services;
 
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.UserDAO;
-import Server.Model.User;
-import Server.Requests.LoginRequest;
-import Server.Results.LoginResult;
+import Model.User;
+import Requests.LoginRequest;
+import Results.LoginResult;
 import dataAccess.DataAccessException;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 /**

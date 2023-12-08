@@ -1,16 +1,12 @@
 package Server.DAOClasses;
 
-import Server.Model.Game;
-import Server.Model.User;
+import Model.User;
 import dataAccess.DataAccessException;
 import dataAccess.Database;
 
 import java.sql.Connection;
-import java.sql.DataTruncation;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import static java.sql.DriverManager.getConnection;

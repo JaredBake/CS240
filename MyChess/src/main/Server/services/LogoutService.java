@@ -1,10 +1,8 @@
 package Server.services;
 
 import Server.DAOClasses.AuthDAO;
-import Server.DAOClasses.UserDAO;
-import Server.Model.User;
-import Server.Requests.LogoutRequest;
-import Server.Results.LogoutResult;
+import Requests.LogoutRequest;
+import Results.LogoutResult;
 import dataAccess.DataAccessException;
 
 public class LogoutService {

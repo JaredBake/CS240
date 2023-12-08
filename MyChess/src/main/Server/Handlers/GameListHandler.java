@@ -1,9 +1,7 @@
 package Server.Handlers;
 
-import Server.DAOClasses.AuthDAO;
-import Server.DAOClasses.GameDAO;
-import Server.Requests.GameListRequest;
-import Server.Results.GameListResult;
+import Requests.GameListRequest;
+import Results.GameListResult;
 import Server.services.GameListService;
 import com.google.gson.Gson;
 import spark.Request;

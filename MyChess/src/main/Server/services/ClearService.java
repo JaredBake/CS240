@@ -3,8 +3,8 @@ package Server.services;
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
-import Server.Requests.ClearRequest;
-import Server.Results.ClearResult;
+import Requests.ClearRequest;
+import Results.ClearResult;
 
 import java.sql.SQLException;
 

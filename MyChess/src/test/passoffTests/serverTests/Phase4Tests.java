@@ -1,24 +1,19 @@
 package passoffTests.serverTests;
 
+import Requests.ClearRequest;
+import Requests.CreateRequest;
+import Requests.RegisterRequest;
+import Results.CreateResult;
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
-import Server.Handlers.CreateHandler;
-import Server.Model.Game;
-import Server.Model.User;
-import Server.Requests.*;
-import Server.Results.*;
+import Model.Game;
+import Model.User;
 import Server.services.*;
-import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.Database;
 import org.junit.jupiter.api.*;
-import passoffTests.obfuscatedTestClasses.TestServerFacade;
-import passoffTests.testClasses.TestModels;
 
-import javax.xml.crypto.Data;
-import java.awt.image.RGBImageFilter;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -54,68 +49,6 @@ public class Phase4Tests {
         CreateResult createResult = new CreateService().createGame(createRequest);
         gameID = createResult.getGameID();
     }
-
-
-//
-//    @Test
-//    @DisplayName("Phase4 Test")
-//    public void persistenceTest() throws DataAccessException {
-//        //insert a bunch of data
-//        //-------------------------------------------------------------------------------------------------------------
-//        //register 2nd user
-//
-//
-//        //create 2 games
-//        CreateRequest createRequest = validCreateGameRequest();
-//
-//        //first one has both players in it
-//        createRequest.setGameName("test1");
-//        createRequest.setAuthToken(existingAuth);
-//        CreateResult createResult = new CreateService().createGame(createRequest);
-//
-//
-//
-//
-//
-//
-//        //second empty game
-//        createRequest.setGameName("test2");
-//        CreateResult createResult2 = new CreateService().createGame(createRequest);
-//
-//
-//
-//
-//
-//        //set games & check if swapped
-//        ArrayList<Game> game1 = listResult1.getGames();
-//        ArrayList<Game> game2 = listResult2.getGames();
-//        if (Objects.equals(game1.get(0).getGameID(), game2.get(1).getGameID())) { //swap games if needed
-//            ArrayList<Game> tempGame = game1;
-//            game1 = game2;
-//            game2 = tempGame;
-//        }
-//
-//
-//        //check that both tests are there
-//        Assertions.assertEquals("test1", game1.get(0).getGameName(), "Game name changed after restart");
-//        Assertions.assertEquals(createResult.getGameID(), game1.get(0).getGameID(), "Game ID Changed after restart");
-//        Assertions.assertEquals("test2", game2.get(1).getGameName(), "Game name changed after restart");
-//        Assertions.assertEquals(createResult2.getGameID(), game2.get(1).getGameID(), "Game ID changed after restart");
-//
-//        //check players in test1 game
-//        Assertions.assertEquals(user.getUsername(), game1.get(0).getWhiteUsername(),
-//                "White player username changed after restart");
-//        Assertions.assertEquals("Emma", game1.get(0).getBlackUsername(), "Black player username changed after restart");
-//
-//        //make sure second user can log in
-//        LoginRequest loginRequest = new LoginRequest();
-//        loginRequest.setUsername("Emma");
-//        loginRequest.setPassword(user.getPassword());
-//        LoginResult loginResult = new LoginService().login(loginRequest);
-//
-//        Assertions.assertNull(loginResult.getMessage(), "Second user not able to log in after restart");
-//        //-------------------------------------------------------------------------------------------------------------
-//    }
 
 
     @Test

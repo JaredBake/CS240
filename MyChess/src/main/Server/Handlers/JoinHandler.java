@@ -1,15 +1,8 @@
 package Server.Handlers;
 
-import Server.DAOClasses.AuthDAO;
-import Server.DAOClasses.GameDAO;
-import Server.DAOClasses.UserDAO;
-import Server.Model.User;
-import Server.Requests.JoinRequest;
-import Server.Requests.RegisterRequest;
-import Server.Results.JoinResult;
-import Server.Results.RegisterResult;
+import Requests.JoinRequest;
+import Results.JoinResult;
 import Server.services.JoinService;
-import Server.services.RegisterService;
 import com.google.gson.Gson;
 import spark.Request;
 import spark.Response;

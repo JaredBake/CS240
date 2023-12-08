@@ -7,7 +7,7 @@ import Server.Adapters.PieceAdapter;
 import Server.Adapters.PositionAdapter;
 import chess.*;
 import com.google.gson.Gson;
-import Server.Model.Game;
+import Model.Game;
 import com.google.gson.GsonBuilder;
 import dataAccess.DataAccessException;
 import dataAccess.Database;

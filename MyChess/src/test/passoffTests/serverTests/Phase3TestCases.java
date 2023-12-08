@@ -1,10 +1,10 @@
 package passoffTests.serverTests;
 
+import Requests.*;
+import Results.*;
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
-import Server.Requests.*;
-import Server.Results.*;
 import Server.services.*;
 import dataAccess.DataAccessException;
 import org.junit.jupiter.api.*;

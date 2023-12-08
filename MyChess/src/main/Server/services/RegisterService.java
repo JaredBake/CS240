@@ -2,9 +2,9 @@ package Server.services;
 
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.UserDAO;
-import Server.Model.User;
-import Server.Requests.RegisterRequest;
-import Server.Results.RegisterResult;
+import Model.User;
+import Requests.RegisterRequest;
+import Results.RegisterResult;
 import dataAccess.DataAccessException;
 
 import java.sql.SQLException;
