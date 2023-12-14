@@ -144,7 +144,7 @@ public class ClientTests {
 
     @Test
     @Order(9)
-    @DisplayName("Success Return Game List")
+    @DisplayName("Success List")
     public void goodList() throws Exception{
         // Create a game to call
         createGame("Game2");
@@ -159,7 +159,7 @@ public class ClientTests {
 
     @Test
     @Order(10)
-    @DisplayName("Failed Create Game")
+    @DisplayName("Failed List")
     public void badList() throws Exception {
         // Create a game to call
         createGame("Game3");
@@ -174,7 +174,7 @@ public class ClientTests {
 
     @Test
     @Order(11)
-    @DisplayName("Failed Create Game")
+    @DisplayName("Successful Join")
     public void goodJoin() throws Exception {
         // Create User
         String token = createUser("Steve");
@@ -192,7 +192,7 @@ public class ClientTests {
 
     @Test
     @Order(12)
-    @DisplayName("Failed Create Game")
+    @DisplayName("Failed Join")
     public void badJoin() throws Exception {
         // Create User
         String token = createUser("Klye");

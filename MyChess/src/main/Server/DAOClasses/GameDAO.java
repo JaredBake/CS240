@@ -1,10 +1,10 @@
 package Server.DAOClasses;
 
 
-import Server.Adapters.BoardAdapter;
-import Server.Adapters.GameAdapter;
-import Server.Adapters.PieceAdapter;
-import Server.Adapters.PositionAdapter;
+import Adapters.BoardAdapter;
+import Adapters.GameAdapter;
+import Adapters.PieceAdapter;
+import Adapters.PositionAdapter;
 import chess.*;
 import com.google.gson.Gson;
 import Model.Game;

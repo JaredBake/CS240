@@ -1,8 +1,12 @@
 package client;
 
+import Adapters.PieceAdapter;
 import Requests.*;
 import Results.*;
+import chess.ChessPiece;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import javax.websocket.WebSocketContainer;
 import java.io.IOException;
 import java.io.InputStream;
@@ -174,9 +178,7 @@ public class ServerFacade {
     // Write out a header
         http.addRequestProperty("Content-Type", "application/json");
         http.addRequestProperty("Authorization", request.getAuthToken());
-
-    // Write out the body
-
+        
 
         // Make the request
         http.connect();
