@@ -192,7 +192,7 @@ public class ServerFacade {
             try (InputStream respBody = http.getErrorStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(respBody);
                 String resonseString = readString(respBody);
-                return new Gson().fromJson(resonseString, GameListResult.class);
+                return new Gson().fromJson(inputStreamReader, GameListResult.class);
             }
         }
     }
