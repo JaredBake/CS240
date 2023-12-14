@@ -16,6 +16,8 @@ public class Server implements Route {
     /**
      * Handler needs to interpret a Json into the pieces and then put it back together.
      */
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
+
     public static void main(String[] args) {
         new Server().run();
     }
@@ -24,9 +26,10 @@ public class Server implements Route {
         // Specify the port you want the server to listen on
         Spark.port(8080);
         // Register a directory for hosting static files
-        Spark.webSocket("/connect", WSServer.class);
         Spark.externalStaticFileLocation("web");
-//        Spark.before((request, response) -> {System.out.println(requestInfoToString(request));});
+        Spark.webSocket("/connect", webSocketHandler);
+
+        Spark.before((request, response) -> {System.out.println(requestInfoToString(request));});
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.delete("/db", new ClearHandler());
@@ -38,9 +41,9 @@ public class Server implements Route {
         Spark.put("/game", new JoinHandler());
     }
 
-//    private static String requestInfoToString(Request request) {
-//        return request.requestMethod() + " " + request.url() + " " + request.body() + " " + request.headers("Authorization");
-//    }
+    private static String requestInfoToString(Request request) {
+        return request.requestMethod() + " " + request.url() + " " + request.body() + " " + request.headers("Authorization");
+    }
 
 
     @Override

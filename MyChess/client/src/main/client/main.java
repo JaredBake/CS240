@@ -9,6 +9,8 @@ import Model.Game;
 import Requests.*;
 import Results.*;
 import org.javatuples.*;
+import ui.EscapeSequences;
+
 import static ui.EscapeSequences.*;
 
 public class main {
@@ -158,15 +160,15 @@ public class main {
                 " Please type \"help\" to get started! \u2623%n>>> ");
     }
 
-    public static void displayPreLoginCommands(PrintStream out){
-        out.println(SET_BG_COLOR_DARK_GREEN);
-        out.print(SET_TEXT_BOLD );
-        out.print(SET_TEXT_COLOR_YELLOW);
-        System.out.printf("help : Displays user actions available.\n" +
+    public static void displayPreLoginCommands(PrintStream out) {
+        out.println(EscapeSequences.SET_BG_COLOR_DARK_GREEN + EscapeSequences.SET_TEXT_BOLD +
+                EscapeSequences.SET_TEXT_COLOR_YELLOW +
+                "help : Displays user actions available.\n" +
                 "quit : Exits the program.\n" +
                 "login : Login a registered account.\n" +
-                "register : Create a new account.%n>>> ");
-
+                "register : Create a new account." + EscapeSequences.RESET_TEXT_COLOR +
+                EscapeSequences.RESET_BG_COLOR +
+                "\n>>> ");
     }
 
     public static void memberAccessCommands(PrintStream out){
@@ -246,9 +248,9 @@ public class main {
                 displayList(out, list);
             }else if (line.equals("join")){
                 Pair<Integer, String> join = memberJoin(out);
-                while (join == null){
+                if (join == null){
                     badRequest(out);
-                    join = memberJoin(out);
+                    continue;
                 }
                 JoinRequest request = new JoinRequest();
                 request.setGameID(join.getValue0());
@@ -256,13 +258,15 @@ public class main {
                 request.setAuthToken(token);
                 try {
                     JoinResult result = server.join(request);
+                    joinGameUI(out, token, join);
                     // TODO: Return the game String to display
+                    return "logout";
                 } catch (Exception message) {
                     System.out.println("Could not create list");
                     badRequest(out);
                     continue;
                 }
-                displayGame(out, join.getValue1());
+//                displayGame(out, join.getValue1());
             }else if (line.equals("observe")) {
                 Integer observe = memberObserve(out);
                 JoinRequest request = new JoinRequest();
@@ -271,6 +275,7 @@ public class main {
                 request.setAuthToken(token);
                 try {
                     JoinResult result = server.join(request);
+                    observeGameUI();
                     // TODO: Return the game String to display
                 } catch (Exception message) {
                     System.out.println("Could not create list");
@@ -288,6 +293,121 @@ public class main {
                 badRequest(out);
             }
         }
+    }
+
+    public static void joinGameUI(PrintStream out, String token, Pair<Integer, String> info) throws Exception {
+        out.println(SET_BG_COLOR_DARK_GREEN);
+        out.print(SET_TEXT_BOLD);
+        out.print(SET_TEXT_COLOR_YELLOW);
+        WSClient client = new WSClient();
+
+        try {
+            // Assuming ChessClient has a method to send messages to the server
+            // Update this based on your actual implementation
+            client.send("JOIN_GAME " + info.getValue0() + " " + info.getValue1());
+
+            // TODO: Call the ChessClient method to handle the game joining logic
+            handleGameJoin(client, info.getValue0(), info.getValue1());
+        } catch (Exception message) {
+            System.out.println("Could not join the game");
+            badRequest(out);
+        }
+    }
+
+    private static void handleGameJoin(WSClient client, Integer value0, String value1) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        String command;
+        // Display available commands to the user
+        displayGameJoinCommands();
+        while (true) {
+
+
+            // Read user input
+            command = scanner.nextLine().trim().toLowerCase();
+
+            // Process user commands
+            switch (command) {
+                case "help":
+                    displayGameJoinCommands();
+                    continue;
+                case "redraw":
+                    redrawChessBoard();
+                    continue;
+                case "leave":
+                    leaveGame();
+                    return;  // exit the loop and method
+                case "move":
+                    Pair<String, String> moves = getMove();
+                    client.sendMakeMoveCommand(moves);
+                    continue;
+                case "resign":
+                    resign();
+                    break;
+                case "highlight":
+                    highlightLegalMoves();
+                    continue;
+                default:
+                    System.out.println("Invalid command. Type 'help' for available commands.");
+            }
+        }
+    }
+
+    private static void displayGameJoinCommands() {
+        System.out.println("Available Commands:");
+        System.out.println(" - help:\t\t\tDisplays what actions you can take.");
+        System.out.println(" - redraw:\tRedraws the chess board.");
+        System.out.println(" - leave:\t\tLeave the game.");
+        System.out.println(" - move:\t\tInput position of piece to move and position of where to move it.");
+        System.out.println(" - resign:\t\tThe user forfeits the game.");
+        System.out.println(" - highlight:\tHighlights legal moves.");
+        System.out.print(">>> ");
+    }
+
+    private static void redrawChessBoard() {
+        // Redraw the chess board
+        System.out.println("Redrawing chess board...");
+    }
+
+    private static void leaveGame() {
+        // Perform actions to leave the game
+        System.out.println("Leaving the game. Transitioning back to Post-Login UI.");
+        // Additional logic to handle leaving the game
+    }
+
+    private static Pair<String, String> getMove() {
+        // Allow the user to input a move and update the board
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Please type the position of the piece you would like to move:");
+        var piece = scanner.next();
+        System.out.println("Please type the position of where you would like to move to:");
+        var move = scanner.next();
+        // Additional logic for making a move
+
+        return new Pair<>(piece,move);
+    }
+
+    private static void resign() {
+        // Prompt the user to confirm resignation and forfeit the game
+        System.out.println("Are you sure you want to resign? (Type 'yes' to confirm)");
+        Scanner scanner = new Scanner(System.in);
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        if ("yes".equals(confirmation)) {
+            System.out.println("Resigning... The game is over.");
+            // Additional logic for resigning
+        } else {
+            System.out.println("Resignation canceled.");
+        }
+    }
+
+    private static void highlightLegalMoves() {
+        // Allow the user to input a piece to highlight legal moves
+        System.out.println("Highlighting legal moves for a piece...");
+        // Additional logic for highlighting legal moves
+    }
+
+    private static void observeGameUI(){
+
     }
 
     private static void displayGame(PrintStream out, String color) {
@@ -490,8 +610,9 @@ public class main {
         out.print(SET_TEXT_BOLD);
         out.print(SET_TEXT_COLOR_YELLOW);
 
+        System.out.println("Here is the list of Games current open:\n");
         for (Game game: list){
-            System.out.println("Here is the list of Games current open:\n" +
+            System.out.println("\n" +
                     "Game: " + game.getGameName() + ",\n" +
                     "\tWhite player: " + game.getWhiteUsername() + ",\n" +
                     "\tBlack player: " + game.getBlackUsername() + ",\n" +

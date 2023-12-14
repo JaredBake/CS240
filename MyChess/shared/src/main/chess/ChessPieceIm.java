@@ -611,7 +611,6 @@ public class ChessPieceIm implements ChessPiece {
             type = PieceType.PAWN;
         }
     }
-
     private boolean pawnAttack(ChessPosition temp_position, ChessGame.TeamColor pc, ChessBoard board){
         if (temp_position.getColumn() > 8 || temp_position.getRow() > 8){
             return false;
@@ -652,7 +651,6 @@ public class ChessPieceIm implements ChessPiece {
         }
         return true;
     }
-
     public void setPosition(ChessPosition p){
         position = (ChessPositionIm) p;
     }
@@ -663,7 +661,6 @@ public class ChessPieceIm implements ChessPiece {
         ChessPieceIm that = (ChessPieceIm) o;
         return blocked_piece == that.blocked_piece && teamColor == that.teamColor && type == that.type && Objects.equals(position, that.position);
     }
-
     public ChessPosition getPosition(){
         return position;
     }
