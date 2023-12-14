@@ -1,5 +1,7 @@
 package Server.Servers;
 
+import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.*;
 import Server.DAOClasses.AuthDAO;
 import Server.DAOClasses.GameDAO;
 import Server.DAOClasses.UserDAO;
@@ -22,8 +24,9 @@ public class Server implements Route {
         // Specify the port you want the server to listen on
         Spark.port(8080);
         // Register a directory for hosting static files
+        Spark.webSocket("/connect", WSServer.class);
         Spark.externalStaticFileLocation("web");
-        Spark.before((request, response) -> {System.out.println(requestInfoToString(request));});
+//        Spark.before((request, response) -> {System.out.println(requestInfoToString(request));});
 
         // Register handlers for each endpoint using the method reference syntax
         Spark.delete("/db", new ClearHandler());
@@ -34,9 +37,10 @@ public class Server implements Route {
         Spark.post("/game", new CreateHandler());
         Spark.put("/game", new JoinHandler());
     }
-    private static String requestInfoToString(Request request) {
-        return request.requestMethod() + " " + request.url() + " " + request.body() + " " + request.headers("Authorization");
-    }
+
+//    private static String requestInfoToString(Request request) {
+//        return request.requestMethod() + " " + request.url() + " " + request.body() + " " + request.headers("Authorization");
+//    }
 
 
     @Override
