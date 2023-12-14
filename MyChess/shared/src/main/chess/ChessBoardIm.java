@@ -2,7 +2,6 @@ package chess;
 
 public class ChessBoardIm implements ChessBoard {
 
-//    ArrayList<ArrayList<ChessPositionIm>> board = new ArrayList<ArrayList<ChessPositionIm>>();
     private ChessPiece[][] board;
 
     public ChessBoardIm(){

@@ -14,6 +14,13 @@ import java.io.InputStreamReader;
 import java.net.*;
 
 public class ServerFacade {
+    private final Gson gson;
+
+    public ServerFacade() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ChessPiece.class, new PieceAdapter());
+        this.gson = gsonBuilder.create();
+    }
     public static void main(String[] args) throws Exception {
 
     }
@@ -167,7 +174,8 @@ public class ServerFacade {
     }
 
     public GameListResult list(GameListRequest request) throws Exception {
-        // Specify the desired endpoint
+
+    // desired endpoint
         URI uri = new URI("http://localhost:8080/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod("GET");
@@ -178,7 +186,7 @@ public class ServerFacade {
     // Write out a header
         http.addRequestProperty("Content-Type", "application/json");
         http.addRequestProperty("Authorization", request.getAuthToken());
-        
+
 
         // Make the request
         http.connect();
@@ -188,7 +196,7 @@ public class ServerFacade {
             // Output the response body
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-                return new Gson().fromJson(inputStreamReader, GameListResult.class);
+                return gson.fromJson(inputStreamReader, GameListResult.class);
             }
         }else {
             try (InputStream respBody = http.getErrorStream()) {

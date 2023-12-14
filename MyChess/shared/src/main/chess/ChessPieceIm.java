@@ -11,8 +11,7 @@ public class ChessPieceIm implements ChessPiece {
     private Set<ChessPosition> live_ones = new HashSet<>();
     private ChessGame.TeamColor teamColor;
     private ChessPiece.PieceType type;
-    private ChessPosition position = new ChessPositionIm(1,1);
-
+    private ChessPositionIm position = new ChessPositionIm(1,1);
     public ChessPieceIm(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){
         teamColor = pieceColor;
         this.type = type;
@@ -655,7 +654,7 @@ public class ChessPieceIm implements ChessPiece {
     }
 
     public void setPosition(ChessPosition p){
-        position = p;
+        position = (ChessPositionIm) p;
     }
     @Override
     public boolean equals(Object o) {
